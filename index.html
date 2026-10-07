@@ -1,0 +1,1262 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="간호 스테이션용 병동 환자 현황 관리 대시보드 (UX/UI 과제 프로토타입, 예시 데이터)">
+<meta property="og:title" content="WardBoard 병동 현황">
+<meta property="og:description" content="병상 배정과 환자 확인 누락을 줄이기 위한 병동 현황판 설계 (UX/UI 과제)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='4' fill='%231F63D6'/%3E%3Cpath d='M6.5 3h3v3.5H13v3H9.5V13h-3V9.5H3v-3h3.5z' fill='%23fff'/%3E%3C/svg%3E">
+<title>WardBoard 병동 현황</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+*{box-sizing:border-box}body{margin:0}[hidden]{display:none!important}img{max-width:100%}
+
+/* Layout: 상단 고정 바 + 3개 뷰(설계 노트 / 병동 대시보드 / 환자 현황). 위에서 아래로 "오늘 → 추세 → 예측" 순서 */
+:root{
+  --bg:#F3F5F8; --surface:#FFFFFF; --surface-2:#F6F8FB; --line:#E2E7EE; --line-2:#EDF0F4;
+  --t1:#121821; --t2:#4E5A68; --t3:#8691A0;
+  --accent:#1F63D6; --accent-soft:#E7EFFC; --accent-ink:#164EAF;
+  --crit:#D42F2F; --crit-soft:#FDEBEB; --crit-ink:#B42121;
+  --warn:#D9770B; --warn-soft:#FFF3E1; --warn-ink:#A85A00;
+  --ok:#14885A; --ok-soft:#E3F5EC; --ok-ink:#0E6E48;
+  --muted-fill:#E9EDF2;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --s5:#e87ba4; --s6:#8a94a3;
+  --ly:#A9B2BE;
+  --font:'Pretendard','IBM Plex Sans KR','Apple SD Gothic Neo','Noto Sans KR',system-ui,sans-serif;
+  --mono:'IBM Plex Mono','SF Mono',ui-monospace,Menlo,monospace;
+  --r-lg:16px; --r-md:12px; --r-sm:8px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0E1217; --surface:#161B22; --surface-2:#1B212A; --line:#2A313B; --line-2:#222831;
+  --t1:#EEF1F5; --t2:#AAB3BF; --t3:#76808D;
+  --accent:#5B93F0; --accent-soft:#1C2C46; --accent-ink:#8DB4F6;
+  --crit:#F06464; --crit-soft:#3A1E21; --crit-ink:#FF8E8E;
+  --warn:#F0A040; --warn-soft:#3A2B17; --warn-ink:#F7BC6E;
+  --ok:#3CC08A; --ok-soft:#173227; --ok-ink:#6FD8AA;
+  --muted-fill:#262D37;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#76808D;
+  --ly:#5B6573; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#0E1217; --surface:#161B22; --surface-2:#1B212A; --line:#2A313B; --line-2:#222831;
+  --t1:#EEF1F5; --t2:#AAB3BF; --t3:#76808D;
+  --accent:#5B93F0; --accent-soft:#1C2C46; --accent-ink:#8DB4F6;
+  --crit:#F06464; --crit-soft:#3A1E21; --crit-ink:#FF8E8E;
+  --warn:#F0A040; --warn-soft:#3A2B17; --warn-ink:#F7BC6E;
+  --ok:#3CC08A; --ok-soft:#173227; --ok-ink:#6FD8AA;
+  --muted-fill:#262D37;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#76808D;
+  --ly:#5B6573; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{background:var(--bg)}
+body{font-family:var(--font);color:var(--t1);font-size:14px;line-height:1.5;letter-spacing:-.01em;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit}
+.num,.mono{font-variant-numeric:tabular-nums}
+.mono{font-family:var(--mono);letter-spacing:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+
+/* ── top bar ── */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--surface);border-bottom:1px solid var(--line)}
+.top-in{max-width:1440px;margin:0 auto;padding-inline:20px;display:flex;align-items:center;gap:18px;min-height:58px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:15px;white-space:nowrap}
+.brand .mark{width:26px;height:26px;border-radius:8px;background:var(--accent);display:grid;place-items:center}
+.brand .mark svg{width:16px;height:16px}
+.brand small{font-weight:500;color:var(--t3);font-size:12px}
+.tabs{display:flex;gap:4px;flex-wrap:wrap}
+.tab{border:0;background:none;padding:8px 12px;border-radius:10px;font-weight:600;color:var(--t2);cursor:pointer;font-size:14px}
+.tab:hover{background:var(--surface-2)}
+.tab[aria-selected="true"]{background:var(--accent-soft);color:var(--accent-ink)}
+.top-right{margin-left:auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.sel{appearance:none;border:1px solid var(--line);background:var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238691A0' stroke-width='1.6' fill='none'/%3E%3C/svg%3E") no-repeat right 10px center;padding:7px 30px 7px 12px;border-radius:10px;font:inherit;font-weight:600;color:var(--t1)}
+.clock{font-size:13px;color:var(--t2);white-space:nowrap}
+.clock b{color:var(--t1);font-weight:600}
+.switch{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--t2);cursor:pointer;user-select:none;white-space:nowrap}
+.switch input{appearance:none;width:34px;height:20px;border-radius:20px;background:var(--muted-fill);position:relative;cursor:pointer;transition:background .15s;margin:0}
+.switch input::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2);transition:transform .15s}
+.switch input:checked{background:var(--accent)}
+.switch input:checked::after{transform:translateX(14px)}
+
+.page{max-width:1440px;margin:0 auto;padding-inline:20px;padding-block:24px 64px}
+.view[hidden]{display:none!important}
+
+/* ── shared ── */
+.h-row{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+.eyebrow{font-size:12px;font-weight:600;color:var(--t3);letter-spacing:.02em}
+h1{font-size:24px;line-height:1.35;margin:4px 0 0;font-weight:700;text-wrap:balance;letter-spacing:-.02em}
+h2{font-size:17px;margin:0;font-weight:700;letter-spacing:-.015em}
+h3{font-size:15px;margin:0;font-weight:700}
+.sub{color:var(--t2);font-size:13px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:20px;min-width:0}
+.card-h{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.grid{display:grid;gap:16px}
+.grid>*{min-width:0}
+.g-main{grid-template-columns:minmax(0,1.75fr) minmax(0,1fr)}
+.g-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g-fc{grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)}
+@media (max-width:1100px){.g-main,.g-fc{grid-template-columns:1fr}.g-3{grid-template-columns:1fr 1fr}}
+@media (max-width:720px){.g-3{grid-template-columns:1fr}.page{padding-inline:16px}.top-in{padding-inline:16px}h1{font-size:20px}}
+.seg{display:inline-flex;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{border:0;background:none;padding:5px 11px;border-radius:7px;font-size:13px;font-weight:600;color:var(--t2);cursor:pointer;white-space:nowrap}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--t1);box-shadow:0 1px 2px rgba(16,24,40,.08)}
+.seg button .c{color:var(--t3);font-weight:500;margin-left:4px}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;padding:2px 8px;border-radius:6px;white-space:nowrap;line-height:1.5}
+.b-crit{background:var(--crit-soft);color:var(--crit-ink)}
+.b-warn{background:var(--warn-soft);color:var(--warn-ink)}
+.b-ok{background:var(--ok-soft);color:var(--ok-ink)}
+.b-info{background:var(--accent-soft);color:var(--accent-ink)}
+.b-mute{background:var(--muted-fill);color:var(--t2)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--t2)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:7px 12px;font-weight:600;font-size:13px;cursor:pointer;white-space:nowrap}
+.btn:hover{background:var(--surface-2)}
+.btn-p{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn-p:hover{background:var(--accent-ink)}
+.link{color:var(--accent-ink);font-weight:600;font-size:13px;background:none;border:0;cursor:pointer;padding:0}
+.link:hover{text-decoration:underline}
+
+/* ── dashboard: bed summary ── */
+.sum{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,2fr);gap:28px;align-items:center}
+@media (max-width:900px){.sum{grid-template-columns:1fr;gap:18px}}
+.sum-head .big{font-size:40px;font-weight:700;letter-spacing:-.03em;line-height:1.1}
+.sum-head .big small{font-size:16px;color:var(--t2);font-weight:600;margin-left:4px}
+.sum-head p{margin:6px 0 0;color:var(--t2);font-size:13px}
+.gender{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.stack{display:flex;height:14px;border-radius:7px;overflow:hidden;gap:2px;background:var(--surface)}
+.stack span{display:block;height:100%}
+.stack span:first-child{border-radius:7px 0 0 7px}.stack span:last-child{border-radius:0 7px 7px 0}
+.sum-cells{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-top:14px}
+@media (max-width:560px){.sum-cells{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.sum-cell{border:0;background:none;text-align:left;padding:8px 10px;border-radius:10px;cursor:pointer}
+.sum-cell:hover,.sum-cell[aria-pressed="true"]{background:var(--surface-2)}
+.sum-cell .k{font-size:12px;color:var(--t2);display:flex;align-items:center;gap:6px;white-space:nowrap}
+.sum-cell .k i{width:9px;height:9px;border-radius:3px;display:inline-block;flex:none}
+.sum-cell .v{font-size:22px;font-weight:700;letter-spacing:-.02em}
+.sum-cell .d{font-size:11px;color:var(--t3)}
+
+/* bed board */
+.board{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:10px}
+.room{border:1px solid var(--line-2);background:var(--surface-2);border-radius:12px;padding:8px}
+.room-h{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;margin:0 2px 6px;gap:6px}
+.room-h b{font-size:13px}
+.room-h span{color:var(--t3);white-space:nowrap}
+.room-h .sx-m{color:var(--accent-ink)} .room-h .sx-f{color:#C2457A}
+.beds{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.beds.one{grid-template-columns:1fr}
+.bed{position:relative;border-radius:7px;padding:5px 6px;min-height:40px;font-size:11px;line-height:1.3;cursor:default;border:1px solid transparent;transition:opacity .15s}
+.bed .no{font-family:var(--mono);font-size:10px;opacity:.75}
+.bed .nm{font-weight:600;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.bed .dp{font-size:10px;opacity:.8}
+.bed.occ{background:var(--surface);border-color:var(--line);color:var(--t1)}
+.bed.dis{background:var(--warn-soft);color:var(--warn-ink)}
+.bed.adm{background:var(--surface);border:1px dashed var(--accent);color:var(--accent-ink)}
+.bed.emp{background:var(--ok-soft);color:var(--ok-ink)}
+.bed.cln{background:repeating-linear-gradient(135deg,var(--muted-fill) 0 5px,var(--surface-2) 5px 10px);color:var(--t2)}
+.bed .dot{position:absolute;top:5px;right:5px;width:7px;height:7px;border-radius:50%}
+.bed .dot.c{background:var(--crit)} .bed .dot.w{background:var(--warn)}
+.board.filtering .bed:not(.hit){opacity:.18}
+.bd-legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--t2);margin-top:12px}
+.bd-legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:14px;height:10px;border-radius:3px;display:inline-block}
+.sw.occ{background:var(--surface);border:1px solid var(--line)} .sw.dis{background:var(--warn-soft);border:1px solid var(--warn)}
+.sw.adm{border:1px dashed var(--accent)} .sw.emp{background:var(--ok-soft);border:1px solid var(--ok)}
+.sw.cln{background:repeating-linear-gradient(135deg,var(--muted-fill) 0 3px,var(--surface-2) 3px 6px);border:1px solid var(--line)}
+
+/* dept */
+.dept-row{display:grid;grid-template-columns:118px minmax(0,1fr) 72px;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--line-2);font-size:13px}
+.dept-row:last-child{border-bottom:0}
+.dept-row .nm{display:flex;align-items:center;gap:8px;white-space:nowrap}
+.dept-row .nm i{width:10px;height:10px;border-radius:3px;flex:none}
+.dept-row .nm small{color:var(--t3);font-family:var(--mono);font-size:11px}
+.track{height:8px;background:var(--surface-2);border-radius:4px;overflow:hidden}
+.track span{display:block;height:100%;border-radius:0 4px 4px 0}
+.dept-row .v{text-align:right;font-weight:600}
+.dept-row .v small{color:var(--t3);font-weight:500;margin-left:4px}
+.ev{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line-2);font-size:13px}.ev:last-child{border-bottom:0}.ev .t{font-family:var(--mono);font-weight:600;color:var(--t2)}.ev .s{color:var(--t3);font-size:12px}
+.dept-sub{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+.mini{background:var(--surface-2);border-radius:10px;padding:10px 12px}
+.mini .k{font-size:12px;color:var(--t2)} .mini .v{font-size:18px;font-weight:700}
+
+/* charts */
+.chart{position:relative;width:100%}
+.chart svg{display:block;width:100%;overflow:visible}
+.ax{fill:var(--t3);font-size:11px;font-family:var(--font)}
+.grid-l{stroke:var(--line-2);stroke-width:1}
+.base-l{stroke:var(--line);stroke-width:1}
+.kpi-line{display:flex;align-items:baseline;gap:8px;margin:2px 0 10px;flex-wrap:wrap}
+.kpi-line .v{font-size:24px;font-weight:700;letter-spacing:-.02em}
+.kpi-line .d{font-size:12px;font-weight:600}
+.up{color:var(--t2)}
+.tip{position:fixed;z-index:50;pointer-events:none;background:var(--t1);color:var(--bg);border-radius:10px;padding:8px 10px;font-size:12px;line-height:1.5;box-shadow:0 6px 20px rgba(0,0,0,.18);max-width:260px;opacity:0;transition:opacity .08s}
+.tip.on{opacity:1}
+.tip b{font-weight:700}
+.tip .r{display:flex;align-items:center;gap:6px;justify-content:space-between}
+.tip .r i{width:8px;height:8px;border-radius:2px;display:inline-block;margin-right:6px}
+.fc-table{width:100%;border-collapse:collapse;font-size:13px}
+.fc-table th{font-size:12px;color:var(--t3);font-weight:500;text-align:left;padding:6px 6px;border-bottom:1px solid var(--line)}
+.fc-table td{padding:8px 6px;border-bottom:1px solid var(--line-2)}
+.fc-table td.r,.fc-table th.r{text-align:right}
+.fc-table tr.hl td{background:var(--warn-soft)}
+.cmp{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:16px}
+@media (max-width:560px){.cmp{grid-template-columns:1fr}}
+.cmp .mini .v{font-size:22px}
+.cmp .mini .d{font-size:12px;color:var(--t2)}
+
+.callout{display:flex;align-items:center;gap:14px;justify-content:space-between;background:var(--crit-soft);border-radius:14px;padding:14px 18px;margin-bottom:16px;flex-wrap:wrap}
+.callout p{margin:0;font-size:14px;color:var(--t1)}
+.callout b{color:var(--crit-ink)}
+
+/* ── patients ── */
+.pri{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.pcard{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.pcard.c{border-color:color-mix(in srgb,var(--crit) 40%,var(--line))}
+.pcard .top-l{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.pcard .who{font-size:15px;font-weight:700}
+.pcard .who small{font-weight:500;color:var(--t2);font-size:13px;margin-left:6px}
+.pcard ul{margin:0;padding-left:16px;font-size:13px;color:var(--t1)}
+.pcard ul li::marker{color:var(--t3)}
+.pcard .meta{font-size:12px;color:var(--t3);display:flex;justify-content:space-between;align-items:center;gap:8px}
+.pcard.ack{opacity:.55}
+.io{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+@media (max-width:900px){.io{grid-template-columns:1fr}}
+.io-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;padding:12px 0;border-bottom:1px solid var(--line-2);align-items:center}
+.io-row:last-child{border-bottom:0}
+.io-row .who{font-weight:600}
+.io-row .who small{color:var(--t2);font-weight:500;margin-left:6px}
+.io-row .ln{font-size:12px;color:var(--t3);margin-top:2px}
+.chks{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.chk{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:4px 9px 4px 7px;font-size:12px;font-weight:600;color:var(--t2);cursor:pointer}
+.chk svg{width:14px;height:14px}
+.chk .bx{width:14px;height:14px;border-radius:4px;border:1.5px solid var(--ly);display:grid;place-items:center}
+.chk[aria-pressed="true"]{background:var(--ok-soft);border-color:transparent;color:var(--ok-ink)}
+.chk[aria-pressed="true"] .bx{background:var(--ok);border-color:var(--ok)}
+.prog{font-size:13px;font-weight:700;text-align:right;white-space:nowrap}
+.prog small{display:block;font-size:11px;color:var(--t3);font-weight:500}
+.prog.done{color:var(--ok-ink)}
+
+.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.search{flex:1 1 220px;max-width:320px;position:relative}
+.search input{width:100%;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:8px 12px 8px 34px;font:inherit;color:var(--t1)}
+.search svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--t3)}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r-lg);background:var(--surface)}
+table.pt{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;min-width:1180px}
+.pt th{position:sticky;top:0;background:var(--surface-2);font-size:12px;color:var(--t2);font-weight:600;text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+.pt td{padding:10px 12px;border-bottom:1px solid var(--line-2);vertical-align:middle;white-space:nowrap}
+.pt tbody tr.p{cursor:pointer}
+.pt tbody tr.p:hover td{background:var(--surface-2)}
+.pt tr.grp td{background:var(--bg);font-size:12px;color:var(--t2);font-weight:600;padding:7px 12px}
+.pt tr.grp td span{color:var(--t3);font-weight:500;margin-left:8px}
+.pt tr.emp td{color:var(--t3);font-size:12px}
+.pt td.bed-c{font-family:var(--mono);font-size:12px;color:var(--t2)}
+.pt .nm{font-weight:700;font-size:14px}
+.pt .nm small{font-weight:500;color:var(--t2);margin-left:6px;font-size:12px}
+.pt .dx{white-space:normal;min-width:200px;max-width:260px;line-height:1.35}
+.pt .hd{color:var(--t3);font-size:12px;margin-left:6px}
+.pt .lv{width:56px}
+.flags{display:flex;gap:4px;flex-wrap:wrap}
+.same{font-size:11px;font-weight:700;color:var(--crit-ink);background:var(--crit-soft);border-radius:4px;padding:0 5px;margin-left:6px}
+.empty-st{padding:40px;text-align:center;color:var(--t3)}
+
+.drawer-bg{position:fixed;inset:0;background:rgba(10,14,20,.32);z-index:60;opacity:0;pointer-events:none;transition:opacity .15s}
+.drawer-bg.on{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(440px,100%);background:var(--surface);z-index:61;transform:translateX(100%);transition:transform .2s;display:flex;flex-direction:column;border-left:1px solid var(--line)}
+.drawer.on{transform:none}
+.dr-h{padding:calc(18px + env(safe-area-inset-top,0px)) 20px 16px;border-bottom:1px solid var(--line)}
+.dr-b{padding:18px 20px 40px;overflow:auto;display:flex;flex-direction:column;gap:20px}
+.idpair{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap}
+.idpair div{background:var(--surface-2);border-radius:10px;padding:8px 12px}
+.idpair .k{font-size:11px;color:var(--t3)} .idpair .v{font-weight:700;font-size:15px}
+.kv{display:grid;grid-template-columns:96px 1fr;gap:8px 12px;font-size:13px}
+.kv dt{color:var(--t3)} .kv dd{margin:0}
+.vit{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.vit div{background:var(--surface-2);border-radius:10px;padding:8px 10px}
+.vit .k{font-size:11px;color:var(--t3)} .vit .v{font-weight:700}
+.vit .v.c{color:var(--crit-ink)}
+.x{border:0;background:var(--surface-2);width:32px;height:32px;border-radius:10px;cursor:pointer;font-size:18px;line-height:1}
+
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);background:var(--t1);color:var(--bg);border-radius:12px;padding:10px 12px 10px 16px;display:flex;gap:14px;align-items:center;z-index:70;opacity:0;pointer-events:none;transition:all .18s;font-size:13px;max-width:calc(100% - 32px)}
+.toast.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+.toast button{background:none;border:0;color:var(--accent-soft);font-weight:700;cursor:pointer;padding:4px 6px}
+
+/* ── analysis (설계 노트) ── */
+.doc{max-width:1080px;margin:0 auto;display:flex;flex-direction:column;gap:56px}
+.doc section{display:flex;flex-direction:column;gap:18px}
+.doc .lead{font-size:15px;color:var(--t2);max-width:68ch;margin:0}
+.doc h2{font-size:22px;letter-spacing:-.02em;text-wrap:balance}
+.hero-doc h1{font-size:30px;max-width:none}
+@media (max-width:720px){.hero-doc h1{font-size:24px}}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.users{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:900px){.users{grid-template-columns:1fr}}
+.users .card h3{margin-bottom:6px}
+.users .q{background:var(--surface-2);border-radius:10px;padding:10px 12px;font-size:13px;margin-top:10px}
+.users .when{font-size:12px;color:var(--t3);margin-top:8px}
+.timeline{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;border:1px solid var(--line);border-radius:var(--r-lg);background:var(--surface);overflow:hidden}
+.timeline>div{padding:14px 16px;border-right:1px solid var(--line-2)}
+.timeline>div:last-child{border-right:0}
+.timeline .t{font-family:var(--mono);font-size:13px;color:var(--accent-ink);font-weight:600}
+.timeline .d{font-size:13px;color:var(--t2);margin-top:4px}
+@media (max-width:720px){.timeline{grid-template-columns:1fr 1fr}.timeline>div:nth-child(2){border-right:0}.timeline>div:nth-child(-n+2){border-bottom:1px solid var(--line-2)}}
+.probs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:900px){.probs{grid-template-columns:1fr}}
+.probs .card p{margin:8px 0 0;font-size:13px;color:var(--t2)}
+.insight{background:var(--accent-soft);border-radius:var(--r-lg);padding:20px 22px}
+.insight .k{font-size:12px;font-weight:700;color:var(--accent-ink)}
+.insight p{margin:6px 0 0;font-size:15px}
+.qs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:14px}
+@media (max-width:900px){.qs{grid-template-columns:1fr 1fr}}
+@media (max-width:520px){.qs{grid-template-columns:1fr}}
+.qs div{background:var(--surface);border-radius:12px;padding:12px 14px;font-size:13px}
+.qs b{display:block;font-size:14px;margin-bottom:4px}
+.qs span{color:var(--t2)}
+.hyp{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:900px){.hyp{grid-template-columns:1fr}}
+.hyp .card{display:flex;flex-direction:column;gap:10px}
+.hyp .lbl{font-size:12px;font-weight:700;color:var(--t3)}
+.hyp .if,.hyp .then{font-size:13px}
+.hyp .if b,.hyp .then b{display:block;font-size:12px;color:var(--accent-ink);margin-bottom:2px}
+.hyp .meas{font-size:12px;color:var(--t2);border-top:1px solid var(--line-2);padding-top:10px;margin-top:auto}
+.ia{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:820px){.ia{grid-template-columns:1fr}}
+.ia ol{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;gap:8px;counter-reset:l}
+.ia li{counter-increment:l;display:grid;grid-template-columns:28px 1fr;gap:10px;background:var(--surface-2);border-radius:10px;padding:10px 12px;font-size:13px}
+.ia li::before{content:counter(l);width:22px;height:22px;border-radius:7px;background:var(--surface);display:grid;place-items:center;font-weight:700;font-size:12px;color:var(--accent-ink)}
+.ia li b{display:block;font-size:14px}
+.ia li span{color:var(--t2)}
+.refs{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.refs .card .src{font-size:12px;color:var(--t3);margin-top:2px}
+.refs .card p{margin:10px 0 0;font-size:13px}
+.refs .card p b{color:var(--accent-ink);font-weight:600;margin-right:6px}
+.trade{display:flex;flex-direction:column;gap:10px}
+.trade .card{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px}
+@media (max-width:820px){.trade .card{grid-template-columns:1fr;gap:10px}}
+.trade h3{grid-column:1/-1}
+.trade .k{font-size:12px;font-weight:700;margin-bottom:4px}
+.trade .rk{color:var(--crit-ink)} .trade .rs{color:var(--ok-ink)}
+.trade p{margin:0;font-size:13px;color:var(--t2)}
+.rules{width:100%;border-collapse:collapse;font-size:13px}
+.rules th,.rules td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line-2);vertical-align:top}
+.rules th{font-size:12px;color:var(--t3);font-weight:600;border-bottom-color:var(--line)}
+.rules td:first-child{white-space:nowrap}
+.cta-row{display:flex;gap:10px;flex-wrap:wrap}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* ── app shell ── */
+html,body{height:100%}
+.app{display:grid;grid-template-columns:252px minmax(0,1fr);min-height:100vh}
+.side{position:sticky;top:0;height:100vh;overflow:auto;background:var(--surface);border-right:1px solid var(--line);padding:18px 14px;display:flex;flex-direction:column;gap:18px}
+.side .brand{padding:2px 6px}
+.wsel{background:var(--surface-2);border-radius:12px;padding:10px 12px}
+.wsel .k{font-size:11px;color:var(--t3);font-weight:600}
+.wsel select{width:100%;margin-top:4px;border:0;background-color:transparent;padding-left:0;font-size:15px}
+.wsel .m{font-size:12px;color:var(--t2);margin-top:2px}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav .lbl{font-size:11px;color:var(--t3);font-weight:600;padding:10px 12px 4px}
+.nv{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;color:var(--t2);font-weight:600;text-decoration:none;font-size:14px}
+.nv svg{width:18px;height:18px;flex:none}
+.nv:hover{background:var(--surface-2);color:var(--t1)}
+.nv.on{background:var(--accent-soft);color:var(--accent-ink)}
+.nv .cnt{margin-left:auto;font-size:11px;font-weight:700;border-radius:10px;padding:1px 7px;background:var(--muted-fill);color:var(--t2)}
+.nv .cnt.r{background:var(--crit);color:#fff}
+.me{margin-top:auto;border-top:1px solid var(--line);padding-top:14px;display:flex;flex-direction:column;gap:12px}
+.me-h{display:flex;align-items:center;gap:10px}
+.av{width:34px;height:34px;border-radius:50%;background:var(--accent-soft);color:var(--accent-ink);display:grid;place-items:center;font-weight:700}
+.me-h b{display:block;font-size:14px}.me-h span{font-size:12px;color:var(--t3)}
+.me .switch{justify-content:space-between}
+.me .reset{border:0;background:none;color:var(--t3);font-size:12px;text-align:left;padding:0;cursor:pointer;text-decoration:underline}
+.mainc{min-width:0;display:flex;flex-direction:column}
+.hdr{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--surface);border-bottom:1px solid var(--line);min-height:60px;display:flex;align-items:center;gap:14px;padding-inline:24px}
+.crumb{font-size:14px;color:var(--t3);white-space:nowrap}
+.crumb b{color:var(--t1)}
+.gsearch{position:relative;flex:0 1 340px;margin-left:12px}
+.gsearch input{width:100%;border:1px solid var(--line);background:var(--surface-2);border-radius:10px;padding:8px 36px 8px 34px;font:inherit;color:var(--t1)}
+.gsearch input:focus{background:var(--surface);outline:2px solid var(--accent-soft);border-color:var(--accent)}
+.gsearch>svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--t3)}
+.gsearch kbd{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-family:var(--mono);font-size:11px;color:var(--t3);border:1px solid var(--line);border-radius:5px;padding:0 5px;background:var(--surface)}
+.pop{position:absolute;top:calc(100% + 6px);background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 32px rgba(16,24,40,.14);z-index:30;padding:6px;min-width:100%}
+.pop a,.pop .it{display:flex;gap:10px;align-items:center;padding:9px 10px;border-radius:8px;text-decoration:none;color:var(--t1);font-size:13px;cursor:pointer}
+.pop a:hover,.pop a.on,.pop .it:hover{background:var(--surface-2)}
+.pop .s{color:var(--t3);font-size:12px}
+.pop .emp{padding:12px;color:var(--t3);font-size:13px}
+.hdr-r{margin-left:auto;display:flex;align-items:center;gap:12px;position:relative}
+.live{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--t2);white-space:nowrap}
+.pulse{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px var(--ok-soft)}
+.icon-btn{border:0;background:none;width:34px;height:34px;border-radius:10px;display:grid;place-items:center;cursor:pointer;color:var(--t2);position:relative;flex:none}
+.icon-btn:hover{background:var(--surface-2);color:var(--t1)}
+.icon-btn svg{width:18px;height:18px}
+.icon-btn .dotc{position:absolute;top:3px;right:2px;min-width:16px;height:16px;border-radius:8px;background:var(--crit);color:#fff;font-size:10px;font-weight:700;display:grid;place-items:center;padding:0 4px}
+.clk{font-size:13px;color:var(--t2);white-space:nowrap}
+.clk b{color:var(--t1)}
+.bell-pop{right:0;left:auto;width:340px;min-width:0}
+.bell-pop .it{align-items:flex-start}
+.bell-pop .it .badge{margin-top:1px}
+.burger{display:none}
+.scrim{position:fixed;inset:0;background:rgba(10,14,20,.32);z-index:39;opacity:0;pointer-events:none;transition:opacity .15s}
+.scrim.on{opacity:1;pointer-events:auto}
+.view{padding:24px;padding-block:24px 64px;max-width:1480px;width:100%;margin:0 auto}
+@media (max-width:1100px){.live{display:none}}
+@media (max-width:1024px){
+  .app{grid-template-columns:1fr}
+  .side{position:fixed;left:0;top:0;bottom:0;width:272px;z-index:40;transform:translateX(-100%);transition:transform .2s;height:auto}
+  .side.on{transform:none}
+  .burger{display:grid}
+}
+@media (max-width:720px){
+  .hdr{padding-inline:12px;gap:8px}.view{padding-inline:16px}
+  .crumb{display:none}.gsearch{margin-left:0;flex:1 1 auto}.gsearch kbd{display:none}.clk{display:none}
+  .bell-pop{width:min(340px,calc(100vw - 32px))}
+}
+.back{display:inline-flex;align-items:center;gap:4px;color:var(--t2);font-weight:600;font-size:13px;text-decoration:none;margin-bottom:10px}
+.back:hover{color:var(--t1)}
+/* modal */
+.modal-bg{position:fixed;inset:0;background:rgba(10,14,20,.4);z-index:80;display:grid;place-items:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .15s}
+.modal-bg.on{opacity:1;pointer-events:auto}
+.modal{background:var(--surface);border-radius:18px;width:min(560px,100%);max-height:calc(100vh - 32px);overflow:auto;box-shadow:0 24px 60px rgba(0,0,0,.25)}
+.modal-h{padding:20px 22px 6px;display:flex;justify-content:space-between;gap:12px}
+.modal-h h2{font-size:18px}
+.modal-b{padding:8px 22px 4px;font-size:14px;color:var(--t2)}
+.modal-f{padding:16px 22px 20px;display:flex;justify-content:flex-end;gap:8px}
+.opt{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:8px;cursor:pointer;color:var(--t1);background:var(--surface);width:100%;text-align:left}
+.opt:hover{border-color:var(--accent)}
+.opt[aria-checked="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.opt[disabled]{cursor:not-allowed;opacity:.5;background:var(--surface-2)}
+.opt .rd{width:18px;height:18px;border-radius:50%;border:2px solid var(--ly)}
+.opt[aria-checked="true"] .rd{border:5px solid var(--accent)}
+.opt .s{font-size:12px;color:var(--t3)}
+.opt .why{font-size:12px;color:var(--t3);white-space:nowrap}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+/* bed page */
+.g-beds{grid-template-columns:minmax(0,1fr) 360px}
+@media (max-width:1180px){.g-beds{grid-template-columns:1fr}}
+.wl{display:flex;flex-direction:column}
+.wl-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line-2)}
+.wl-row:last-child{border-bottom:0}
+.wl-row b{font-size:14px}
+.wl-row .s{font-size:12px;color:var(--t3)}
+.bed.clickable{cursor:pointer}
+.bed.clickable:hover{outline:2px solid var(--accent);outline-offset:1px}
+.board.lg{grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}
+.board.lg .bed{min-height:48px}
+/* detail */
+.g-pd{grid-template-columns:minmax(0,1fr) minmax(0,1.5fr)}
+@media (max-width:1000px){.g-pd{grid-template-columns:1fr}}
+.pd-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
+.pd-name{font-size:26px;font-weight:700;letter-spacing:-.02em}
+.pd-name small{font-size:15px;color:var(--t2);font-weight:500;margin-left:8px}
+.vgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:560px){.vgrid{grid-template-columns:1fr}}
+.vgrid h3{font-size:13px;display:flex;justify-content:space-between}
+.vgrid h3 span{font-weight:600}
+.notes{display:flex;flex-direction:column}
+.note{display:grid;grid-template-columns:86px minmax(0,1fr);gap:12px;padding:10px 0;border-bottom:1px solid var(--line-2);font-size:13px}
+.note:last-child{border-bottom:0}
+.note .t{font-family:var(--mono);font-size:12px;color:var(--t3)}
+.note .w{font-size:12px;color:var(--t3);margin-top:2px}
+.pt th.sort{cursor:pointer;user-select:none}
+.pt th.sort:hover{color:var(--t1)}
+.pt th .ar{opacity:.4;margin-left:3px}
+.pt th.sorted .ar{opacity:1;color:var(--accent-ink)}
+.strip{display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin-bottom:16px}
+.strip .it{display:flex;gap:18px;flex-wrap:wrap;font-size:14px}
+.strip .it b{font-size:16px}
+.io-act{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.done-l{font-size:13px;color:var(--t2)}
+.done-l div{padding:8px 0;border-bottom:1px solid var(--line-2);display:flex;gap:10px}
+.done-l div:last-child{border-bottom:0}
+
+a.btn{text-decoration:none;color:var(--t1);display:inline-flex;align-items:center}
+a.btn.btn-p{color:#fff}
+.idpair>div{background:var(--surface-2);border-radius:10px;padding:8px 12px}
+.idpair>div div{background:none;padding:0;border-radius:0}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side" id="side">
+    <div class="brand"><span class="mark"><svg viewBox="0 0 16 16" fill="none"><path d="M6.5 2h3v4.5H14v3H9.5V14h-3V9.5H2v-3h4.5z" fill="#fff"/></svg></span>WardBoard</div>
+    <div class="wsel">
+      <div class="k">근무 병동</div>
+      <select class="sel" id="ward" aria-label="병동 선택">
+        <option value="71">71병동</option><option value="72">72병동</option><option value="81">81병동</option>
+      </select>
+      <div class="m" id="ward-m"></div>
+    </div>
+    <nav class="nav" id="nav">
+      <a class="nv" href="#dashboard" data-r="dashboard"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="6" height="8" rx="1.5"/><rect x="11" y="3" width="6" height="5" rx="1.5"/><rect x="11" y="10" width="6" height="7" rx="1.5"/><rect x="3" y="13" width="6" height="4" rx="1.5"/></svg>대시보드</a>
+      <a class="nv" href="#patients" data-r="patients"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="8" cy="7" r="3"/><path d="M2.5 16.5c.6-3 2.9-4.5 5.5-4.5s4.9 1.5 5.5 4.5"/><path d="M13 4.2a3 3 0 010 5.6M15 12.3c1.3.6 2.2 2 2.5 4.2"/></svg>환자 현황<span class="cnt r" id="n-pri"></span></a>
+      <a class="nv" href="#admission" data-r="admission"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="3.5" width="12" height="14" rx="2"/><path d="M7.5 3.5V2.5h5v1M7 10l2 2 4-4"/></svg>오늘 입·퇴원<span class="cnt" id="n-io"></span></a>
+      <a class="nv" href="#beds" data-r="beds"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M2.5 15.5V5M2.5 12h15v3.5M17.5 12V9.5a2 2 0 00-2-2H9v4.5"/><circle cx="6" cy="9" r="1.7"/></svg>병상 배치·배정<span class="cnt" id="n-wait"></span></a>
+      <div class="lbl">과제 문서</div>
+      <a class="nv" href="#notes" data-r="notes"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 2.5h7l3.5 3.5v11.5H5z"/><path d="M12 2.5V6h3.5M8 10h5M8 13h5"/></svg>설계 노트</a>
+    </nav>
+    <div class="me">
+      <div class="me-h"><span class="av">박</span><div><b>박서연 간호사</b><span id="me-m">Day 근무 · 07:00~15:00</span></div></div>
+      <label class="switch"><span>이름 가리기</span><input type="checkbox" id="mask"></label>
+      <label class="switch"><span>야간 모드</span><input type="checkbox" id="dark"></label>
+      <button class="reset" data-act="reset">예시 데이터 처음 상태로 되돌리기</button>
+    </div>
+  </aside>
+  <div class="scrim" id="scrim"></div>
+  <div class="mainc">
+    <header class="hdr">
+      <button class="icon-btn burger" data-act="menu" aria-label="메뉴"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 5h14M3 10h14M3 15h14"/></svg></button>
+      <div class="crumb"><span id="crumb-w"></span> / <b id="crumb-t"></b></div>
+      <div class="gsearch">
+        <svg viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.6"/><path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <input id="gs" type="search" placeholder="환자 검색 (이름, 등록번호, 병실)" autocomplete="off"><kbd>/</kbd>
+        <div class="pop" id="gs-res" hidden></div>
+      </div>
+      <div class="hdr-r">
+        <div class="live"><span class="pulse"></span><span id="upd">방금 갱신</span></div>
+        <button class="icon-btn" data-act="refresh" aria-label="새로고침" title="새로고침"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M16 10a6 6 0 11-1.8-4.3M16 3.5v3.2h-3.2"/></svg></button>
+        <span class="clk" id="clk"></span>
+        <button class="icon-btn" data-act="bell" aria-label="알림"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 8a5 5 0 0110 0c0 4 1.5 5.5 1.5 5.5h-13S5 12 5 8zM8.3 16.5a1.9 1.9 0 003.4 0"/></svg><span class="dotc" id="bell-c" hidden></span></button>
+        <div class="pop bell-pop" id="bell-pop" hidden></div>
+      </div>
+    </header>
+    <main class="view" id="view"></main>
+  </div>
+</div>
+<div class="tip" id="tip"></div>
+<div class="modal-bg" id="mbg"><div class="modal" id="modal" role="dialog" aria-modal="true"></div></div>
+<div class="toast" id="toast"><span id="toast-t"></span><button id="toast-u">되돌리기</button></div>
+
+<template id="tpl-notes"><div class="doc">
+  <section class="hero-doc">
+    <div class="eyebrow">과제 · 병동 환자 현황 관리 대시보드</div>
+    <h1>병상 배정과 환자 확인 누락을 줄이기 위한<br>병동 현황판 설계</h1>
+    <p class="lead">간호 스테이션의 의료진은 근무 중 같은 질문을 반복합니다. 지금 환자를 더 받을 수 있는지, 누구부터 봐야 하는지, 오늘 무엇이 바뀌는지입니다. 이 세 질문에 바로 답하는 것을 목표로, 판단하는 대시보드와 처리하는 환자 현황을 중심에 두고 실제 업무 흐름인 입·퇴원 체크와 병상 배정을 별도 메뉴로 나눴습니다.</p>
+    <div class="cta-row"><a class="btn btn-p" href="#dashboard">대시보드 보기</a><a class="btn" href="#patients">환자 현황 보기</a></div>
+  </section>
+
+  <section>
+    <div class="eyebrow">01 · 사용자와 맥락</div>
+    <h2>같은 화면을 세 역할이 서로 다른 질문으로 봅니다</h2>
+    <div class="users">
+      <div class="card"><h3>수간호사 · 책임간호사</h3><div class="sub">병상 배정, 입퇴원 조율, 인력 배치</div>
+        <div class="q">"응급실에서 남자 환자 한 명 올려도 돼요?"</div>
+        <div class="when">전화를 끊기 전에 답해야 함. 빈 병상 수가 아니라 <b>성별 병실과 격리실까지 고려한 배정 가능 수</b>가 필요</div></div>
+      <div class="card"><h3>담당 간호사</h3><div class="sub">환자 8~12명 담당, 투약과 처치, 입퇴원 수속</div>
+        <div class="q">"인계받은 환자 중에 누구부터 봐야 하지?"</div>
+        <div class="when">인계 직후 몇 분 안에 우선순위를 정함. 목록 40행이 모두 같은 무게로 보이면 위험 환자가 묻힘</div></div>
+      <div class="card"><h3>주치의 · 전공의</h3><div class="sub">회진, 오더, 퇴원 결정</div>
+        <div class="q">"우리 과 환자가 지금 어느 병실에 있지?"</div>
+        <div class="when">한 병동에 여러 진료과가 섞여 있어 회진 동선을 짜려면 진료과 기준으로 다시 봐야 함</div></div>
+    </div>
+    <div class="timeline">
+      <div><div class="t">07:00</div><div class="d">Day 인계. 밤사이 바뀐 환자 확인</div></div>
+      <div><div class="t">08:00–10:00</div><div class="d">회진, 수술 환자 이송, 퇴원 오더 발생</div></div>
+      <div><div class="t">11:00–15:00</div><div class="d">퇴원 수속과 신규 입원이 겹치는 시간. 병상 회전 집중</div></div>
+      <div><div class="t">15:00 · 23:00</div><div class="d">Evening·Night 인계. 같은 확인을 반복</div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">02 · 문제 정의</div>
+    <h2>기존 시스템은 숫자를 보여주지만 판단은 사람에게 남겨둡니다</h2>
+    <div class="probs">
+      <div class="card"><h3>한 환자의 상태가 3~4개 화면에 나뉘어 있습니다</h3><p>입퇴원은 원무 화면, 수술 일정은 수술 스케줄, 바이탈과 낙상 위험은 간호기록에 있습니다. 환자 한 명의 오늘 상태를 알려면 화면을 오가며 머릿속에서 합쳐야 합니다.</p></div>
+      <div class="card"><h3>"빈 병상 5"만으로는 배정 여부를 정할 수 없습니다</h3><p>빈 병상이 여자 4인실에 있으면 남자 환자를 받을 수 없고, 퇴원 후 정리 중인 병상은 바로 쓸 수 없습니다. 실제 배정 가능 수는 다시 병실을 하나씩 확인해서 셉니다.</p></div>
+      <div class="card"><h3>모든 환자 행이 같은 글자 크기와 색으로 보입니다</h3><p>조기경보점수가 7점인 환자와 퇴원을 기다리는 환자가 목록에서 구분되지 않습니다. 확인이 필요한 이유도 적혀 있지 않아 인계 때 말로 다시 전달합니다.</p></div>
+    </div>
+    <div class="insight">
+      <div class="k">핵심 인사이트</div>
+      <p>의료진이 이 화면에 묻는 질문은 네 가지이고, 질문마다 답의 시간 단위가 다릅니다. 지금과 오늘의 질문을 화면 위쪽에, 이번 주와 다음 달의 질문을 아래쪽에 두면 한 화면 안에서도 우선순위가 생깁니다.</p>
+      <div class="qs">
+        <div><b>지금 몇 명을 더 받을 수 있나</b><span>시간 단위: 지금. 병상 배치도와 배정 가능 수</span></div>
+        <div><b>누구부터 봐야 하나</b><span>시간 단위: 지금. 신속 확인 환자와 그 이유</span></div>
+        <div><b>오늘 무엇이 바뀌나</b><span>시간 단위: 오늘. 입·퇴원 예정과 체크 상태</span></div>
+        <div><b>다음 주에 병상이 모자랄까</b><span>시간 단위: 주·월. 추세, 전년 대비, 예측</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">03 · 가설</div>
+    <h2>세 가지 가설을 화면 구조로 옮겼습니다</h2>
+    <div class="hyp">
+      <div class="card"><div class="lbl">가설 ① 병상 배정</div>
+        <div class="if"><b>만약</b>병상 현황을 숫자 표 대신 병실 배치도로 보여주고, 성별 병실과 정리 중 병상을 뺀 '지금 배정 가능 수'를 남·여로 나눠 먼저 보여주면</div>
+        <div class="then"><b>그러면</b>병상 배정 요청에 병실을 하나씩 확인하지 않고 바로 답할 수 있을 것이다</div>
+        <div class="meas">검증 지표: 배정 요청부터 병상 확정까지 걸린 시간, 배정 후 병실 변경 건수</div></div>
+      <div class="card"><div class="lbl">가설 ② 환자 확인</div>
+        <div class="if"><b>만약</b>신속 확인 환자를 목록 맨 위에 따로 고정하고, 색 대신 '왜 봐야 하는지'를 수치와 함께 문장으로 보여주면</div>
+        <div class="then"><b>그러면</b>인계 직후 위험 환자를 놓치는 일이 줄고, 확인 시각이 기록되어 다음 근무조도 알 수 있을 것이다</div>
+        <div class="meas">검증 지표: 신속 확인 표시부터 '확인함'까지 걸린 시간, 미확인 상태로 넘어간 인계 건수</div></div>
+      <div class="card"><div class="lbl">가설 ③ 오늘 업무</div>
+        <div class="if"><b>만약</b>당일 퇴원·입원을 체크리스트(퇴원 오더, 퇴원약, 수납, 교육)로 쪼개고 진행 상태를 병동 전체가 같이 보게 하면</div>
+        <div class="then"><b>그러면</b>퇴원 지연으로 다음 입원 환자가 대기하는 시간이 줄 것이다</div>
+        <div class="meas">검증 지표: 퇴원 오더부터 병상 비움까지 걸린 시간, 입원 대기 시간</div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">04 · 정보 구조</div>
+    <h2>병동 단위로 보는 화면과 환자 단위로 일하는 화면을 나눴습니다</h2>
+    <p class="lead">한 화면에 모든 요구사항을 넣으면 스크롤이 길어지고 위험 환자가 아래로 밀립니다. 대시보드는 판단용, 환자 현황·입퇴원·병상 배정은 처리용으로 역할을 나누고, 각 화면 안에서는 위에서 아래로 시간 단위가 길어지도록 배치했습니다.</p>
+    <div class="ia">
+      <div class="card"><h3>병동 대시보드 <span class="sub">판단용, 스테이션 모니터에 띄워두는 화면</span></h3>
+        <ol>
+          <li><div><b>지금 배정 가능한 병상</b><span>남·여 배정 가능 수, 5개 상태별 병상 수</span></div></li>
+          <li><div><b>병실 배치도</b><span>병실별 성별, 병상 상태, 신속 확인 표시</span></div></li>
+          <li><div><b>진료과별 입원 현황</b><span>환자 수와 비율, 과별 오늘 퇴원 예정</span></div></li>
+          <li><div><b>주간·월간 추세</b><span>입퇴원, 수술, 중환자실 이동</span></div></li>
+          <li><div><b>빈 병상 비교와 예측</b><span>지난달, 전년 동월 대비와 7일 예측</span></div></li>
+        </ol></div>
+      <div class="card"><h3>환자 현황 <span class="sub">처리용, 담당 간호사가 근무 중 계속 여는 화면</span></h3>
+        <ol>
+          <li><div><b>신속 확인 환자</b><span>이유와 수치, '확인함' 기록</span></div></li>
+          <li><div><b>오늘 퇴원·입원 체크</b><span>단계별 체크, 진행률, 되돌리기</span></div></li>
+          <li><div><b>병실별 환자 목록</b><span>과제 필수 항목 전체, 필터와 검색</span></div></li>
+          <li><div><b>환자 상세</b><span>두 가지 식별자, 바이탈, 오늘 일정</span></div></li>
+        </ol></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">05 · 레퍼런스</div>
+    <h2>실제 병원에서 쓰는 화면과 기준에서 가져온 것</h2>
+    <div class="refs">
+      <div class="card"><h3>Epic 병상 관리 (Bed Planning, Unit Census)</h3><div class="src">미국 상급병원 EMR의 병상 보드</div>
+        <p><b>가져온 것</b>병상을 '사용 중, 비어 있음'만이 아니라 정리 중(dirty), 배정됨(assigned) 같은 회전 단계로 나누는 방식. 이 설계의 '정리 중', '입원 예정' 상태가 여기서 왔습니다.</p></div>
+      <div class="card"><h3>TeleTracking 병상 수용 관리</h3><div class="src">병상 회전과 환자 흐름 관리 솔루션</div>
+        <p><b>가져온 것</b>퇴원 예정일(Expected Discharge Date)을 기준으로 앞으로 비게 될 병상을 미리 계산하는 방식. 빈 병상 7일 예측의 계산 근거로 사용했습니다.</p></div>
+      <div class="card"><h3>NHS 병동 전자 화이트보드</h3><div class="src">영국 공공병원 간호 스테이션 대형 모니터</div>
+        <p><b>가져온 것</b>병실 배치 순서대로 환자를 나열하고 낙상, 격리 같은 위험을 아이콘과 글자로 함께 표시하는 방식. 공개된 장소에 띄우는 화면이라 이름을 가리는 옵션도 참고했습니다.</p></div>
+      <div class="card"><h3>NEWS2 조기경보점수</h3><div class="src">영국 왕립내과의사협회(RCP) 표준</div>
+        <p><b>가져온 것</b>호흡수, 산소포화도, 혈압, 맥박, 의식, 체온을 합산해 5~6점은 긴급 평가, 7점 이상은 응급 대응으로 나누는 기준. 신속 확인 환자 분류의 1순위 기준입니다.</p></div>
+      <div class="card"><h3>국내 EMR 간호 인계장 (SBAR)</h3><div class="src">상황, 배경, 평가, 권고 순서의 인계 형식</div>
+        <p><b>가져온 것</b>인계 때 말로 전달하는 '왜 이 환자를 봐야 하는지'를 화면 문장으로 남기는 방식. 신속 확인 카드는 상황(수치)과 평가(이유)를 먼저 씁니다.</p></div>
+      <div class="card"><h3>환자 확인 2가지 식별자 원칙</h3><div class="src">의료기관 인증 환자안전 기준</div>
+        <p><b>가져온 것</b>이름만으로 환자를 식별하지 않고 등록번호나 생년월일을 함께 확인하는 원칙. 목록과 상세에서 이름 옆에 항상 두 번째 식별자를 두고, 같은 병동의 동명이인은 따로 표시합니다.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">06 · 의사결정과 트레이드오프</div>
+    <h2>밀도, 색, 개인정보, 오조작에서 내린 결정</h2>
+    <div class="trade">
+      <div class="card"><h3>01 한 화면에 한 가지 일 vs 간호 스테이션의 정보 밀도</h3>
+        <div><div class="k rk">위험</div><p>정보를 덜어내 화면을 여러 개로 나누면 바쁜 시간대에 클릭과 화면 이동이 늘어납니다. 반대로 다 넣으면 위험 환자가 숫자 사이에 묻힙니다.</p></div>
+        <div><div class="k rs">대응</div><p>화면은 판단용과 처리용 2개로만 나누고, 밀도는 그대로 두되 시간 단위로 위아래 순서를 정했습니다. 정상 상태는 회색 글자로 두고 문제가 있는 곳에만 색을 씁니다.</p></div></div>
+      <div class="card"><h3>02 진료과 색과 상태 색의 충돌</h3>
+        <div><div class="k rk">위험</div><p>진료과마다 색을 주면 6~8가지 색이 병상 배치도와 목록에 섞여, 빨강과 주황이 '위험'인지 '어떤 과'인지 헷갈립니다.</p></div>
+        <div><div class="k rs">대응</div><p>빨강은 즉시 확인, 주황은 오늘 처리할 일에만 씁니다. 진료과 색은 진료과 차트 안에서만 쓰고, 목록과 배치도에서는 OS, GS 같은 진료과 약어 글자로 표시합니다.</p></div></div>
+      <div class="card"><h3>03 모두가 보는 모니터와 개인정보</h3>
+        <div><div class="k rk">위험</div><p>스테이션 모니터는 보호자와 방문객 시야에 노출됩니다. 이름과 진단명이 그대로 보이면 개인정보 노출이 됩니다.</p></div>
+        <div><div class="k rs">대응</div><p>상단에 '이름 가리기'를 두어 홍*동 형태로 바꿉니다. 병상 배치도는 진단명 없이 진료과 약어만 보여줍니다. 왼쪽 메뉴 아래 스위치로 직접 확인할 수 있습니다.</p></div></div>
+      <div class="card"><h3>04 체크 기능의 오조작</h3>
+        <div><div class="k rk">위험</div><p>퇴원약이나 수납 체크를 잘못 누르면 실제로는 안 된 일이 된 것으로 보여, 다음 근무조가 확인을 건너뜁니다.</p></div>
+        <div><div class="k rs">대응</div><p>모든 체크에 처리자와 시각을 남기고, 누른 직후 하단에 되돌리기를 띄웁니다. 의료기기 화면 설계에서 쓴 '실수해도 바로 되돌릴 수 있게' 원칙을 그대로 적용했습니다.</p></div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">07 · 상태 정의</div>
+    <h2>화면에서 쓰는 상태와 분류 기준</h2>
+    <div class="grid g-main" style="grid-template-columns:repeat(auto-fit,minmax(320px,1fr))">
+      <div class="card"><h3 style="margin-bottom:8px">병상 상태 5가지</h3>
+        <table class="rules"><thead><tr><th>상태</th><th>정의</th></tr></thead><tbody>
+          <tr><td><span class="sw occ"></span> 사용 중</td><td>재원 환자가 있는 병상</td></tr>
+          <tr><td><span class="sw dis"></span> 퇴원 예정</td><td>오늘 퇴원 오더가 난 병상. 퇴원 후 정리 중으로 바뀜</td></tr>
+          <tr><td><span class="sw adm"></span> 입원 예정</td><td>오늘 들어올 환자가 배정된 빈 병상. 다른 환자 배정 불가</td></tr>
+          <tr><td><span class="sw cln"></span> 정리 중</td><td>퇴원 후 소독, 침구 교체 중. 보통 1~2시간 뒤 빈 병상</td></tr>
+          <tr><td><span class="sw emp"></span> 빈 병상</td><td>지금 바로 배정 가능. 다인실은 병실 성별을 따름</td></tr>
+        </tbody></table></div>
+      <div class="card"><h3 style="margin-bottom:8px">신속 확인 환자 분류</h3>
+        <table class="rules"><thead><tr><th>단계</th><th>기준 (하나라도 해당)</th></tr></thead><tbody>
+          <tr><td><span class="badge b-crit">즉시</span></td><td>NEWS2 7점 이상, 검사 결과 이상치(critical value) 보고, 신경학적 상태 변화</td></tr>
+          <tr><td><span class="badge b-warn">주의</span></td><td>NEWS2 5~6점, 오늘 수술, 수술 후 24시간 이내, 입원 24시간 이내</td></tr>
+          <tr><td><span class="badge b-mute">표시</span></td><td>낙상 고위험, 격리, 금식(NPO). 우선순위는 바꾸지 않고 목록에 글자로 표시</td></tr>
+        </tbody></table></div>
+    </div>
+  </section>
+</div>
+</template>
+<script>
+(()=>{
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const TODAY=new Date(2026,9,7,10,42);
+const WD=['일','월','화','수','목','금','토'];
+const pad=n=>String(n).padStart(2,'0');
+const fmtD=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const md=d=>`${d.getMonth()+1}/${d.getDate()}(${WD[d.getDay()]})`;
+const addD=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
+function rng(seed){let a=seed>>>0;return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+
+const DEPT={
+  OS:{n:'정형외과',c:'--s1',dr:['김정훈','이도현'],dx:['Fracture of tibia and fibula','Intertrochanteric fracture of femur','Rotator cuff tear, right','Osteoarthritis of knee (TKR)','Distal radius fracture','ACL rupture, left','Lumbar spinal stenosis']},
+  NS:{n:'신경외과',c:'--s2',dr:['박민재'],dx:['Lumbar disc herniation L4-5','Cervical myelopathy','Chronic subdural hematoma','Compression fracture of L1']},
+  GS:{n:'외과',c:'--s3',dr:['정하윤','최우석'],dx:['Acute appendicitis','Acute cholecystitis','Inguinal hernia, right','Sigmoid colon cancer']},
+  IM:{n:'내과',c:'--s4',dr:['한지수','오세훈'],dx:['Community-acquired pneumonia','Acute pyelonephritis','Cellulitis of lower leg','Uncontrolled type 2 diabetes']},
+  RM:{n:'재활의학과',c:'--s5',dr:['윤가람'],dx:['Rehabilitation after stroke','Rehabilitation after TKR']},
+};
+const WARDS={
+  '71':{name:'71병동',loc:'본관 7층 서쪽',base:700,seed:71,w:{OS:.46,NS:.2,GS:.1,IM:.14,RM:.1}},
+  '72':{name:'72병동',loc:'본관 7층 동쪽',base:750,seed:72,w:{GS:.38,IM:.34,OS:.12,NS:.06,RM:.1}},
+  '81':{name:'81병동',loc:'본관 8층 서쪽',base:800,seed:81,w:{IM:.58,GS:.16,RM:.14,NS:.12}},
+};
+const ROOMS=[[1,'1인실',1,1],[2,'1인실',1,1],[3,'2인실',2],[4,'2인실',2],[5,'4인실',4],[6,'4인실',4],[7,'4인실',4],[8,'4인실',4],[9,'4인실',4],[10,'4인실',4],[11,'6인실',6],[12,'6인실',6]];
+const SUR='김이박최정강조윤장임한오서신권황안송류홍';
+const GM='민준,서준,도윤,예준,시우,주원,하준,지호,준서,건우,현우,우진,성호,영수,동훈,재석,상철,광수'.split(',');
+const GF='서연,서윤,지우,하은,민서,지민,수빈,예은,영희,순자,미경,은정,현숙,정희,옥자,경숙'.split(',');
+const NURSES=['박서연','이수진','김하늘','최예린'];
+
+
+function pick(r,a){return a[Math.floor(r()*a.length)]}
+function wpick(r,w){let x=r(),s=0;for(const k in w){s+=w[k];if(x<s)return k}return Object.keys(w)[0]}
+
+function build(id){
+  const cfg=WARDS[id], r=rng(cfg.seed*7919);
+  const rooms=[], patients=[], incoming=[];
+  let reg=100000+cfg.seed*1013;
+  const usedNames={};
+  const mkName=(sex)=>{let n;do{n=pick(r,SUR)+pick(r,sex==='M'?GM:GF)}while(usedNames[n]&&r()<.9);usedNames[n]=(usedNames[n]||0)+1;return n};
+  ROOMS.forEach(([i,grade,nb,iso],ri)=>{
+    const no=cfg.base+i, gender=r()<.55?'M':'F';
+    const room={no,grade,iso:!!iso,gender:nb>1?gender:null,beds:[]};
+    for(let b=1;b<=nb;b++){
+      const x=r();let st=x<.74?'occ':x<.84?'dis':x<.9?'adm':x<.94?'cln':'emp';
+      const bed={id:`${no}-${b}`,room,no:b,st};
+      if(st==='occ'||st==='dis'){
+        const sex=room.gender||(r()<.5?'M':'F');
+        const age=Math.floor(22+r()*66);
+        const by=2026-age-(r()<.5?0:1);const bm=1+Math.floor(r()*12),bd=1+Math.floor(r()*28);
+        const bdate=new Date(by,bm-1,bd);let a=2026-by-((bm>10||(bm===10&&bd>7))?1:0);
+        const dept=wpick(r,cfg.w), D=DEPT[dept];
+        const hd=st==='dis'?Math.floor(3+r()*12):Math.floor(r()*22)+(r()<.85?1:0);
+        const adm=addD(TODAY,-hd);adm.setHours(hd===0?7+Math.floor(r()*3):8+Math.floor(r()*10),pick(r,[0,10,20,30,40,50]));
+        let disPlan=st==='dis'?'오늘':(r()<.12?'내일':(r()<.12?md(addD(TODAY,2+Math.floor(r()*4))):'-'));
+        const news=r()<.05?7+Math.floor(r()*2):r()<.06?5+Math.floor(r()*2):Math.floor(r()*4);
+        const p={id:'p'+reg,name:mkName(sex),sex,birth:`${String(by).slice(2)}${pad(bm)}${pad(bd)}`,age:a,reg:'A'+(reg++),
+          dept,dr:pick(r,D.dr),dx:pick(r,D.dx),adm,hd,disPlan,grade,bed,
+          nurse:NURSES[Math.floor(r()*NURSES.length)],
+          news,fall:a>=70?r()<.6:r()<.12,isoF:room.iso&&r()<.7?pick(r,['접촉 격리','비말 격리']):null,npo:r()<.1,
+          opToday:(dept==='OS'||dept==='GS'||dept==='NS')&&hd===1&&r()<.7,postOp:(dept==='OS'||dept==='GS'||dept==='NS')&&hd===2&&r()<.6,
+          lab:r()<.03?pick(r,['K 6.1 mmol/L','Hb 6.8 g/dL','Troponin I 0.42 ng/mL']):null,newAdm:hd===0};
+        if(st==='dis'){p.news=Math.min(p.news,2);p.opToday=p.postOp=p.lab=false;p.lab=null}
+        bed.p=p;patients.push(p);
+      }
+      if(st==='adm'){
+        const sex=room.gender||(r()<.5?'M':'F');const dept=wpick(r,cfg.w);
+        const age=Math.floor(25+r()*60);
+        bed.inc={name:mkName(sex),sex,age,dept,dx:pick(r,DEPT[dept].dx),route:pick(r,['응급실','외래 예약','외래 예약','중환자실 전동']),eta:pick(r,['11:30','13:00','14:00','15:30','16:00']),reg:'A'+(reg++)};
+        incoming.push(bed);
+      }
+      room.beds.push(bed);
+    }
+    rooms.push(room);
+  });
+  // 과제 예시 환자: 홍길동
+  if(id==='71'){
+    const bed=rooms[4].beds[1];rooms[4].gender='M';
+    const adm=new Date(2026,9,4,14,20);
+    bed.st='occ';bed.inc=null;
+    const p={id:'pA123456',name:'홍길동',sex:'M',birth:'880101',age:38,reg:'A123456',dept:'OS',dr:'김정훈',dx:'Fracture of tibia and fibula',adm,hd:3,disPlan:'-',grade:'4인실',bed,nurse:'박서연',news:5,fall:false,isoF:null,npo:false,opToday:false,postOp:true,lab:null,newAdm:false};
+    rooms[4].beds.forEach(b=>{if(b.p&&b.p.sex!=='M'){b.p.sex='M';b.p.name=pick(r,SUR)+pick(r,GM)}if(b.inc&&b.inc.sex!=='M'){b.inc.sex='M';b.inc.name=pick(r,SUR)+pick(r,GM)}});
+    const old=patients.indexOf(bed.p);if(old>=0)patients.splice(old,1);
+    const oi=incoming.indexOf(bed);if(oi>=0)incoming.splice(oi,1);
+    bed.p=p;patients.push(p);
+    // 동명이인 예시
+    const twin=patients.find(x=>x!==p&&x.sex==='M'&&x.bed.room.no!==705&&x.bed.st==='occ');if(twin)twin.name='홍길동';
+  }
+  function all0(){return rooms.flatMap(r=>r.beds)}
+  // 정리: 최소 하나씩 보장
+  const all=rooms.flatMap(r=>r.beds);
+  if(!all.some(b=>b.st==='emp')){const b=all.find(b=>b.st==='cln');if(b)b.st='emp'}
+  // 오늘 퇴원 최소 2명
+  patients.filter(p=>p.bed.st==='occ'&&p.hd>=6&&p.news<5&&!p.lab&&p.reg!=='A123456').slice(0,Math.max(0,2-all0().filter(b=>b.st==='dis').length)).forEach(p=>{p.bed.st='dis';p.disPlan='오늘';p.opToday=p.postOp=false});
+  // 현실적인 비율로 보정: 즉시 최대 2명, 주의 성격 최대 4명, 오늘 수술 2명
+  let cC=0,wC=0;
+  patients.slice().sort((x,y)=>x.reg.localeCompare(y.reg)).forEach(p=>{
+    if(p.reg==='A123456')return;
+    if(p.news>=7||p.lab){if(cC<2){cC++;if(p.news>=7)p.lab=null}else{p.lab=null;p.news=wC<2?5+(p.age%2):2;if(p.news>=5)wC++}}
+    else if(p.news>=5){if(wC<2)wC++;else p.news=3}
+  });
+  let oc=patients.filter(p=>p.opToday).length;
+  patients.forEach(p=>{if(oc<2&&!p.opToday&&p.bed.st==='occ'&&p.news<5&&!p.lab&&!p.postOp&&['OS','NS','GS'].includes(p.dept)&&p.hd>=1&&p.reg!=='A123456'){p.opToday=true;p.npo=true;oc++}});
+  let nc=patients.filter(p=>p.newAdm).length;
+  patients.forEach(p=>{if(p.newAdm&&nc>1){p.newAdm=false;nc--}});
+  patients.forEach(p=>{
+    const R=[];let lv=0;
+    if(p.news>=7){R.push(`NEWS2 ${p.news}점 (SpO₂ ${90+((p.age+p.hd)%3)}%, 호흡수 ${23+(p.age%4)}회)`);lv=2}
+    if(p.lab){R.push(`검사 이상치 보고 ${p.lab}`);lv=2}
+    if(p.news>=5&&p.news<7){R.push(`NEWS2 ${p.news}점 (맥박 ${108+(p.age%12)}회, 체온 ${(37.8+(p.age%5)/10).toFixed(1)}℃)`);lv=Math.max(lv,1)}
+    if(p.opToday){R.push(`오늘 수술 ${pick(r,['13:00','14:30','15:00'])} 예정, 금식 확인`);lv=Math.max(lv,1)}
+    if(p.postOp){R.push(`수술 후 ${p.hd===1?'18':'22'}시간, 통증·출혈 관찰`);lv=Math.max(lv,1)}
+    if(p.newAdm){R.push(`오늘 입원, 초기 간호 평가 미완료`);lv=Math.max(lv,1)}
+    p.reasons=R;p.lv=lv;
+    if(p.lv>0)p.ackBy=null;
+  });
+  // 이름 중복
+  const cnt={};patients.forEach(p=>cnt[p.name]=(cnt[p.name]||0)+1);patients.forEach(p=>p.same=cnt[p.name]>1);
+  // 통계 이력
+  const hr=rng(cfg.seed*31);
+  const days=[...Array(7)].map((_,i)=>addD(TODAY,i-6));
+  const wk={labels:days.map(md),adm:days.map(()=>Math.round(4+hr()*5)),dis:days.map(()=>Math.round(3+hr()*6)),op:days.map(d=>d.getDay()%6===0?Math.round(hr()*1):Math.round(2+hr()*5)),icuOut:days.map(()=>Math.round(hr()*2.4)),icuIn:days.map(()=>Math.round(hr()*2.2))};
+  wk.dis[6]=all.filter(b=>b.st==='dis').length;wk.adm[6]=incoming.length+patients.filter(p=>p.newAdm).length;
+  const months=[...Array(6)].map((_,i)=>new Date(2026,4+i,1));
+  const mo={labels:months.map(d=>`${d.getMonth()+1}월`),adm:months.map(()=>Math.round(120+hr()*40)),dis:months.map(()=>Math.round(115+hr()*42)),op:months.map(()=>Math.round(70+hr()*30)),icuOut:months.map(()=>Math.round(5+hr()*7)),icuIn:months.map(()=>Math.round(4+hr()*7))};
+  mo.labels[5]='10월*';
+  const prevW={adm:Math.round(38+hr()*8),dis:Math.round(36+hr()*8),op:Math.round(26+hr()*6),icu:Math.round(5+hr()*4)};
+  // 빈 병상: 10월 실제/예측, 2025년 10월
+  const emptyNow=all.filter(b=>b.st==='emp').length;
+  const ly=[...Array(31)].map((_,i)=>Math.max(1,Math.round(5.6+Math.sin(i/2.2)*1.6+(new Date(2025,9,i+1).getDay()%6===0?1.8:0)+hr()*2-1)));
+  const act=[...Array(7)].map((_,i)=>i===6?emptyNow+all.filter(b=>b.st==='cln').length:Math.max(1,Math.round(3.6+hr()*2.6)));
+  const fc=[];let cur=act[6];
+  const next7=[];
+  for(let i=7;i<31;i++){
+    const d=new Date(2026,9,i+1),dow=d.getDay();
+    const outs=Math.round((dow===5?7:dow===0||dow===6?2:4.5)+hr()*2);
+    const ins=Math.round((dow===1?7:dow===0||dow===6?2:4.6)+hr()*2);
+    cur=Math.max(0,Math.min(14,cur+outs-ins));
+    const v=i<12?cur:Math.round((cur*.5+4.8*.5));
+    fc.push({d,v,lo:Math.max(0,v-1-Math.floor((i-7)/6)),hi:v+1+Math.floor((i-7)/5),outs,ins});
+    if(i<14)next7.push({d,v,outs,ins});
+  }
+  const lastMonthAvg=3.9+hr()*1.2;
+  return {cfg,rooms,all,patients,incoming,wk,mo,prevW,ly,act,fc,next7,lastMonthAvg};
+}
+
+/* ═══════════ app ═══════════ */
+const BASE=new Date(2026,9,7,10,42,0), T0=Date.now();
+const now=()=>new Date(BASE.getTime()+(Date.now()-T0));
+const hm=d=>`${pad(d.getHours())}:${pad(d.getMinutes())}`;
+const ME='박서연';
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const KEY='wardboard.v1';
+let S={ward:'71',mask:false,theme:'light',period:'w',boardF:null,pf:'all',pdept:'all',q:'',mine:false,sort:{k:'room',d:1},sel:null};
+let LOG={};let W=null;let lastSync=Date.now();
+try{const j=JSON.parse(localStorage.getItem(KEY)||'null');if(j){LOG=j.LOG||{};['ward','mask','theme','period'].forEach(k=>{if(j.S&&j.S[k]!=null)S[k]=j.S[k]})}}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify({LOG,S:{ward:S.ward,mask:S.mask,theme:S.theme,period:S.period}}))}catch(e){}}
+
+const nm=p=>S.mask?(p.name.length>=3?p.name[0]+'*'+p.name.slice(2):p.name[0]+'*'):p.name;
+const nmS=s=>S.mask?(s.length>=3?s[0]+'*'+s.slice(2):s[0]+'*'):s;
+const sx=s=>s==='M'?'남':'여';
+const ST={occ:'사용 중',dis:'퇴원 예정',adm:'입원 예정',cln:'정리 중',emp:'빈 병상'};
+const STC={occ:'var(--accent)',dis:'var(--warn)',adm:'color-mix(in srgb,var(--accent) 45%,var(--surface))',cln:'var(--ly)',emp:'var(--ok)'};
+const DSTEPS=['퇴원 오더','퇴원약','수납','퇴원 교육'], ASTEPS=['병상 준비','입원 안내','초기 오더'];
+
+/* ─── data + actions ─── */
+function mkWaiting(){
+  const r=rng(W.cfg.seed*977),ks=Object.keys(W.cfg.w);
+  const src=[['응급실','대기 2시간 10분',null],['응급실','대기 48분','접촉 격리 필요'],['외래 예약','14:30 내원 예정',null],['타 병동 전동','오후 전동 요청',null]];
+  return src.map((s,i)=>{const sex=i%2?'F':'M',dept=ks[i%ks.length];return {wid:`w${W.cfg.seed}${i}`,name:pick(r,SUR)+pick(r,sex==='M'?GM:GF),sex,age:Math.floor(30+r()*55),dept,dx:pick(r,DEPT[dept].dx),from:s[0],wait:s[1],iso:s[2],reg:'A'+(900000+W.cfg.seed*10+i)}});
+}
+const bedById=id=>W.all.find(b=>b.id===id);
+const pByReg=reg=>W.patients.find(p=>p.reg===reg);
+function gOf(r){if(r.beds.length===1)return null;const o=r.beds.find(b=>b.p||b.inc);return o?(o.p?o.p.sex:o.inc.sex):null}
+function why(b,w){if(b.st!=='emp')return ST[b.st];if(w.iso&&!b.room.iso)return '격리 병실 아님';const g=gOf(b.room);if(g&&g!==w.sex)return sx(g)+' 병실';return ''}
+function rebuild(){
+  W=build(S.ward);W.waiting=mkWaiting();W.chk={};W.done=[];
+  W.patients.forEach(p=>p.ack=null);
+  (LOG[S.ward]||[]).forEach(apply);
+}
+function apply(a){
+  const p=a.reg?pByReg(a.reg):null,b=a.bed?bedById(a.bed):null;
+  switch(a.t){
+    case 'ack':if(p)p.ack={t:a.at,by:a.by};break;
+    case 'unack':if(p)p.ack=null;break;
+    case 'chk':W.chk[a.k]=W.chk[a.k]||{};if(a.on)W.chk[a.k][a.i]=a.at+' '+a.by;else delete W.chk[a.k][a.i];break;
+    case 'assign':{const w=W.waiting.find(x=>x.wid===a.wid);if(!b||!w)break;b.st='adm';b.inc={name:w.name,sex:w.sex,age:w.age,dept:w.dept,dx:w.dx,route:w.from,eta:'도착 대기',reg:w.reg,iso:w.iso};W.incoming.push(b);W.waiting=W.waiting.filter(x=>x!==w);break}
+    case 'arrive':{if(!b||!b.inc)break;const i=b.inc,by=2026-i.age;
+      const np={id:'p'+i.reg,name:i.name,sex:i.sex,birth:`${String(by).slice(2)}0315`,age:i.age,reg:i.reg,dept:i.dept,dr:DEPT[i.dept].dr[0],dx:i.dx,adm:new Date(a.ts),hd:0,disPlan:'-',grade:b.room.grade,bed:b,nurse:ME,news:1,fall:i.age>=70,isoF:i.iso?'접촉 격리':null,npo:false,opToday:false,postOp:false,lab:null,newAdm:true,reasons:['오늘 입원, 초기 간호 평가 미완료'],lv:1,same:W.patients.some(x=>x.name===i.name),ack:null};
+      b.p=np;b.st='occ';b.inc=null;W.incoming=W.incoming.filter(x=>x!==b);W.patients.push(np);W.done.push({k:'입원',name:i.name,bed:b.id,at:a.at});break}
+    case 'discharge':{if(!p)break;const bb=p.bed;bb.st='cln';bb.p=null;W.patients=W.patients.filter(x=>x!==p);W.done.push({k:'퇴원',name:p.name,bed:bb.id,at:a.at});break}
+    case 'clean':if(b&&b.st==='cln')b.st='emp';break;
+    case 'displan':if(p){p.disPlan=a.v;if(a.v==='오늘'&&p.bed.st==='occ')p.bed.st='dis';if(a.v!=='오늘'&&p.bed.st==='dis')p.bed.st='occ'}break;
+  }
+}
+function act(a,msg){const n=now();a.at=hm(n);a.by=ME;a.ts=n.getTime();(LOG[S.ward]=LOG[S.ward]||[]).push(a);apply(a);save();render();toast(msg,true)}
+function undo(){const l=LOG[S.ward];if(!l||!l.length)return;l.pop();save();rebuild();render();toast('되돌렸어요',false)}
+
+/* ─── ui helpers ─── */
+const tip=$('#tip');
+function showTip(html,x,y){tip.innerHTML=html;tip.classList.add('on');const w=tip.offsetWidth,h=tip.offsetHeight;let lx=x+14,ly=y+14;if(lx+w>innerWidth-8)lx=x-w-14;if(ly+h>innerHeight-8)ly=y-h-14;tip.style.left=Math.max(8,lx)+'px';tip.style.top=Math.max(8,ly)+'px'}
+function hideTip(){tip.classList.remove('on')}
+let tt=null;
+function toast(msg,canUndo){$('#toast-t').textContent=msg;$('#toast-u').hidden=!canUndo;$('#toast').classList.add('on');clearTimeout(tt);tt=setTimeout(()=>$('#toast').classList.remove('on'),5000)}
+$('#toast-u').onclick=()=>{$('#toast').classList.remove('on');undo()};
+let mOk=null;
+function modal(title,body,okLabel,ok,{danger=false,okDisabled=false}={}){
+  $('#modal').innerHTML=`<div class="modal-h"><h2>${title}</h2><button class="x" data-act="mclose" aria-label="닫기">×</button></div><div class="modal-b">${body}</div><div class="modal-f"><button class="btn" data-act="mclose">취소</button>${okLabel?`<button class="btn btn-p" id="m-ok" ${okDisabled?'disabled':''} ${danger?'style="background:var(--crit);border-color:var(--crit)"':''}>${okLabel}</button>`:''}</div>`;
+  mOk=ok;$('#mbg').classList.add('on');const o=$('#m-ok');if(o)o.onclick=()=>{const f=mOk;closeModal();f&&f()};
+}
+function closeModal(){$('#mbg').classList.remove('on');mOk=null}
+$('#mbg').addEventListener('click',e=>{if(e.target.id==='mbg')closeModal()});
+function counts(){const c={occ:0,dis:0,adm:0,cln:0,emp:0};W.all.forEach(b=>c[b.st]++);return c}
+const LV=p=>p.lv===2?'<span class="badge b-crit">즉시</span>':p.lv===1?'<span class="badge b-warn">주의</span>':'';
+const FLAG=p=>{const f=[];if(p.fall)f.push('<span class="badge b-mute">낙상 고위험</span>');if(p.isoF)f.push(`<span class="badge b-mute">${p.isoF}</span>`);if(p.npo)f.push('<span class="badge b-mute">금식</span>');if(p.opToday)f.push('<span class="badge b-warn">오늘 수술</span>');return f.join('')};
+const admStr=p=>`${fmtD(p.adm)} ${pad(p.adm.getHours())}:${pad(p.adm.getMinutes())}`;
+const pLink=p=>`#patient-${p.reg}`;
+const chkN=k=>W.chk[k]?Object.keys(W.chk[k]).length:0;
+
+/* ─── charts ─── */
+function niceMax(v){const s=[2,4,5,6,8,10,12,15,20,25,30,40,50,60,80,100,120,150,200,250];return s.find(x=>x>=v)||Math.ceil(v/50)*50}
+function bars(host,labels,series,o={}){
+  const W0=Math.max(240,host.clientWidth),H=o.h||170,L=30,R=6,T=8,B=24;
+  const mx=niceMax(Math.max(1,...series.flatMap(s=>s.v)));
+  const iw=W0-L-R,ih=H-T-B,n=labels.length,gw=iw/n,k=series.length;
+  const bw=Math.min(16,(gw*.62-(k-1)*2)/k);const y=v=>T+ih-v/mx*ih;let g='';
+  [0,mx/2,mx].forEach(t=>{g+=`<line class="${t?'grid-l':'base-l'}" x1="${L}" x2="${W0-R}" y1="${y(t)}" y2="${y(t)}"/><text class="ax" x="${L-6}" y="${y(t)+4}" text-anchor="end">${t}</text>`});
+  labels.forEach((lb,i)=>{const cx=L+gw*i+gw/2,x0=cx-(k*bw+(k-1)*2)/2;
+    g+=`<rect class="hov" data-i="${i}" x="${L+gw*i}" y="${T}" width="${gw}" height="${ih}" fill="transparent"/>`;
+    series.forEach((s,j)=>{const v=s.v[i];if(!v)return;const x=x0+j*(bw+2),yy=y(v),h=T+ih-yy,rr=Math.min(4,bw/2,h);
+      g+=`<path d="M${x},${T+ih}V${yy+rr}Q${x},${yy} ${x+rr},${yy}H${x+bw-rr}Q${x+bw},${yy} ${x+bw},${yy+rr}V${T+ih}Z" fill="var(${s.c})" ${o.partial===i?'fill-opacity=".55"':''} pointer-events="none"/>`});
+    if(n<=8||i%2===(n-1)%2)g+=`<text class="ax" x="${cx}" y="${H-6}" text-anchor="middle" ${i===n-1?'font-weight="700" style="fill:var(--t1)"':''}>${lb}</text>`});
+  host.innerHTML=`<svg viewBox="0 0 ${W0} ${H}" height="${H}" role="img" aria-label="${o.aria||''}">${g}</svg>`;
+  host.querySelectorAll('.hov').forEach(r=>{r.addEventListener('mousemove',e=>{const i=+r.dataset.i;host.querySelectorAll('.hov').forEach(h=>h.setAttribute('fill','transparent'));r.setAttribute('fill','var(--surface-2)');
+    showTip(`<b>${labels[i]}</b>${o.partial===i?' (진행 중)':''}`+series.map(s=>`<div class="r"><span><i style="background:var(${s.c})"></i>${s.n}</span><b>${s.v[i]}건</b></div>`).join(''),e.clientX,e.clientY)});
+    r.addEventListener('mouseleave',()=>{r.setAttribute('fill','transparent');hideTip()})});
+}
+function vline(host,pts,o){
+  const W0=Math.max(220,host.clientWidth),H=120,L=34,R=8,T=8,B=20,iw=W0-L-R,ih=H-T-B;
+  const vs=pts.map(p=>p.v),lo=Math.min(o.min,...vs),hi=Math.max(o.max,...vs);
+  const x=i=>L+i/(pts.length-1)*iw,y=v=>T+ih-(v-lo)/(hi-lo)*ih;let g='';
+  g+=`<rect x="${L}" y="${y(o.nhi)}" width="${iw}" height="${y(o.nlo)-y(o.nhi)}" fill="var(--ok)" fill-opacity=".08"/>`;
+  [lo,hi].forEach(t=>g+=`<line class="grid-l" x1="${L}" x2="${W0-R}" y1="${y(t)}" y2="${y(t)}"/><text class="ax" x="${L-6}" y="${y(t)+4}" text-anchor="end">${t}</text>`);
+  pts.forEach((p,i)=>{if(p.day)g+=`<text class="ax" x="${x(i)}" y="${H-4}" text-anchor="middle">${p.day}</text>`});
+  g+=`<polyline points="${pts.map((p,i)=>x(i)+','+y(p.v)).join(' ')}" fill="none" stroke="var(--s1)" stroke-width="2" stroke-linejoin="round"/>`;
+  pts.forEach((p,i)=>{const bad=p.v>o.nhi||p.v<o.nlo;if(bad||i===pts.length-1)g+=`<circle cx="${x(i)}" cy="${y(p.v)}" r="${i===pts.length-1?4.5:3.5}" fill="${bad?'var(--crit)':'var(--s1)'}" stroke="var(--surface)" stroke-width="2"/>`});
+  pts.forEach((p,i)=>g+=`<rect class="hv" data-i="${i}" x="${x(i)-iw/(pts.length-1)/2}" y="${T}" width="${iw/(pts.length-1)}" height="${ih}" fill="transparent"/>`);
+  host.innerHTML=`<svg viewBox="0 0 ${W0} ${H}" height="${H}" role="img" aria-label="${o.n} 추이">${g}</svg>`;
+  host.querySelectorAll('.hv').forEach(r=>{r.addEventListener('mousemove',e=>{const p=pts[+r.dataset.i];showTip(`<b>${p.t}</b><div class="r"><span>${o.n}</span><b>${p.v}${o.u}</b></div>${p.v>o.nhi||p.v<o.nlo?'<div>정상 범위 밖</div>':''}`,e.clientX,e.clientY)});r.addEventListener('mouseleave',hideTip)});
+}
+
+/* ─── shared board ─── */
+function boardHTML(lg){
+  return W.rooms.map(r=>{const g=gOf(r);return `<div class="room"><div class="room-h"><b class="mono">${r.no}</b><span>${r.grade}${r.iso?' · 격리':''}${g?` · <span class="${g==='M'?'sx-m':'sx-f'}">${sx(g)}</span>`:(r.beds.length>1?' · 남녀 무관':'')}</span></div>
+    <div class="beds ${r.beds.length===1?'one':''}">${r.beds.map(b=>{
+      const hit=S.boardF===b.st?'hit':'';
+      if(b.p){const p=b.p;return `<div class="bed ${b.st} ${hit} clickable" data-bed="${b.id}">${p.lv&&!p.ack?`<span class="dot ${p.lv===2?'c':'w'}"></span>`:''}<span class="no">${b.no}</span><span class="nm">${nm(p)}</span><span class="dp">${p.dept} · ${b.st==='dis'?'퇴원':sx(p.sex)+p.age}</span></div>`}
+      if(b.st==='adm')return `<div class="bed adm ${hit} clickable" data-bed="${b.id}"><span class="no">${b.no}</span><span class="nm">${b.inc.eta.includes(':')?b.inc.eta+' 입원':'입원 대기'}</span><span class="dp">${b.inc.dept} · ${b.inc.route}</span></div>`;
+      return `<div class="bed ${b.st} ${hit} clickable" data-bed="${b.id}"><span class="no">${b.no}</span><span class="nm">${ST[b.st]}</span><span class="dp">${b.st==='emp'?(g?sx(g)+' 환자 배정':'남녀 모두'):'소독·침구'}</span></div>`}).join('')}</div></div>`}).join('');
+}
+const LEGEND=`<div class="bd-legend"><span><i class="sw occ"></i>사용 중</span><span><i class="sw dis"></i>퇴원 예정</span><span><i class="sw adm"></i>입원 예정</span><span><i class="sw cln"></i>정리 중</span><span><i class="sw emp"></i>빈 병상</span><span><i class="sw" style="background:var(--crit);border-radius:50%;width:8px;height:8px"></i>즉시 확인</span><span><i class="sw" style="background:var(--warn);border-radius:50%;width:8px;height:8px"></i>주의</span></div>`;
+function bedTip(b){
+  if(b.p){const p=b.p;return `<b>${b.id} · ${nm(p)}</b> (${sx(p.sex)}/${p.age})<br>${DEPT[p.dept].n} ${p.dr} · 입원 ${p.hd+1}일째<br>${S.mask?'':p.dx+'<br>'}${p.reasons.length?'<b>'+p.reasons.join('<br>')+'</b><br>':''}${b.st==='dis'?'오늘 퇴원 예정<br>':''}<span style="opacity:.7">눌러서 상세 보기</span>`}
+  if(b.st==='adm'){const i=b.inc;return `<b>${b.id} · 입원 예정 ${i.eta}</b><br>${nmS(i.name)} (${sx(i.sex)}/${i.age}) · ${DEPT[i.dept].n}<br>경로: ${i.route}`}
+  if(b.st==='emp')return `<b>${b.id} · 빈 병상</b><br>${b.room.grade}${gOf(b.room)?' · '+sx(gOf(b.room))+' 병실':''}<br><span style="opacity:.7">눌러서 환자 배정</span>`;
+  return `<b>${b.id} · 정리 중</b><br>소독·침구 교체<br><span style="opacity:.7">눌러서 정리 완료 처리</span>`;
+}
+function bindBoard(root){
+  root.addEventListener('mousemove',e=>{const el=e.target.closest('.bed');if(!el)return hideTip();showTip(bedTip(bedById(el.dataset.bed)),e.clientX,e.clientY)});
+  root.addEventListener('mouseleave',hideTip);
+}
+function onBed(id){
+  hideTip();const b=bedById(id);
+  if(b.p)return go('patient-'+b.p.reg);
+  if(b.st==='emp')return assignFromBed(b);
+  if(b.st==='cln')return modal(`${b.id} 정리 완료`,`소독과 침구 교체를 마쳤나요? 완료하면 <b>빈 병상</b>으로 바뀌고 바로 배정할 수 있어요.`,'정리 완료',()=>act({t:'clean',bed:b.id},`${b.id} 빈 병상으로 바꿨어요`));
+  if(b.st==='adm')return go('admission');
+}
+function assignFromBed(b){
+  S.sel=null;
+  const list=W.waiting.map(w=>{const r=why(b,w);return `<button class="opt" data-pick="${w.wid}" ${r?'disabled':''} aria-checked="false"><span class="rd"></span><div><b>${nmS(w.name)}</b> <span class="s">${sx(w.sex)}/${w.age} · ${DEPT[w.dept].n}</span><div class="s">${w.from} · ${w.wait}${w.iso?' · '+w.iso:''}</div></div><span class="why">${r?r+'라 불가':''}</span></button>`}).join('');
+  modal(`${b.id} 병상에 배정`,`<p style="margin:0 0 12px">${b.room.grade}${gOf(b.room)?`, ${sx(gOf(b.room))} 병실`:''}입니다. 조건이 맞지 않는 환자는 이유와 함께 비활성화돼요.</p>${list||'<p>병상을 기다리는 환자가 없어요.</p>'}`,'배정하기',()=>{const w=W.waiting.find(x=>x.wid===S.sel);if(w)act({t:'assign',bed:b.id,wid:w.wid},`${nmS(w.name)} 님을 ${b.id}에 배정했어요`)},{okDisabled:true});
+}
+function assignFromWaiting(wid){
+  const w=W.waiting.find(x=>x.wid===wid);S.sel=null;
+  const beds=W.all.filter(b=>b.st==='emp');
+  const ok=beds.filter(b=>!why(b,w)),no=beds.filter(b=>why(b,w));
+  const row=(b,r)=>`<button class="opt" data-pick="${b.id}" ${r?'disabled':''} aria-checked="false"><span class="rd"></span><div><b class="mono">${b.id}</b> <span class="s">${b.room.grade}${b.room.iso?' · 격리':''}</span><div class="s">${gOf(b.room)?sx(gOf(b.room))+' 병실':'남녀 모두 가능'}</div></div><span class="why">${r?r+'라 불가':''}</span></button>`;
+  modal(`${nmS(w.name)} 님 병상 배정`,`<p style="margin:0 0 12px">${sx(w.sex)}/${w.age} · ${DEPT[w.dept].n} · ${w.dx}${w.iso?`<br><b style="color:var(--warn-ink)">${w.iso}</b>, 격리 가능한 1인실만 배정할 수 있어요.`:''}</p>${ok.map(b=>row(b,'')).join('')}${no.map(b=>row(b,why(b,w))).join('')}${beds.length?'':'<p>지금 빈 병상이 없어요. 정리 중 병상을 먼저 완료 처리하세요.</p>'}`,'배정하기',()=>{const b=bedById(S.sel);if(b)act({t:'assign',bed:b.id,wid:w.wid},`${nmS(w.name)} 님을 ${b.id}에 배정했어요`)},{okDisabled:true});
+}
+
+/* ─── views ─── */
+const VIEWS={dashboard:{t:'대시보드',f:vDash},patients:{t:'환자 현황',f:vPatients},admission:{t:'오늘 입·퇴원',f:vAdmission},beds:{t:'병상 배치·배정',f:vBeds},notes:{t:'설계 노트',f:vNotes}};
+
+function vDash(v){
+  const c=counts(),tot=W.all.length,cfg=W.cfg;
+  let m=0,f=0,any=0;W.rooms.forEach(r=>{const e=r.beds.filter(b=>b.st==='emp').length;if(!e)return;const g=gOf(r);if(!g)any+=e;else if(g==='M')m+=e;else f+=e});
+  const pri=W.patients.filter(p=>p.lv&&!p.ack),crit=pri.filter(p=>p.lv===2);
+  v.innerHTML=`<div class="h-row"><div><div class="eyebrow">${cfg.name} · ${cfg.loc} · ${tot}병상 · 재원 ${W.patients.length}명</div><h1>지금 배정 가능한 병상은 ${c.emp}개, 오늘 오후 ${c.dis+c.cln}개가 더 비어요</h1></div></div>
+  ${pri.length?`<div class="callout"><p><b>즉시 확인 ${crit.length}명</b>, 주의 ${pri.length-crit.length}명을 아직 확인하지 않았어요. ${crit.slice(0,2).map(p=>`${p.bed.id} ${nm(p)} (${p.reasons[0].split(' (')[0]})`).join(', ')}</p><a class="btn" href="#patients">환자 현황에서 확인</a></div>`:''}
+  <div class="card" style="margin-bottom:16px"><div class="sum"><div class="sum-head"><div class="eyebrow">지금 배정 가능</div><div class="big num">${c.emp}<small>병상</small></div>
+    <div class="gender"><span class="badge b-info">남 ${m}</span><span class="badge" style="background:color-mix(in srgb,#C2457A 14%,var(--surface));color:#C2457A">여 ${f}</span>${any?`<span class="badge b-mute">남녀 모두 ${any}</span>`:''}${W.waiting.length?`<a class="badge b-warn" href="#beds" style="text-decoration:none">병상 대기 ${W.waiting.length}명</a>`:''}</div>
+    <p>퇴원 예정 ${c.dis}개와 정리 중 ${c.cln}개는 오후에 빈 병상이 됩니다. 입원 예정 ${c.adm}개는 이미 배정되어 계산에서 뺐어요.</p></div>
+    <div><div class="stack">${['occ','dis','adm','cln','emp'].filter(k=>c[k]).map(k=>`<span style="width:${c[k]/tot*100}%;background:${STC[k]}"></span>`).join('')}</div>
+    <div class="sum-cells">${['occ','dis','adm','cln','emp'].map(k=>`<button class="sum-cell" data-f="${k}" aria-pressed="${S.boardF===k}"><div class="k"><i style="background:${STC[k]}"></i>${ST[k]}</div><div class="v num">${c[k]}</div><div class="d">${{occ:`가동률 ${Math.round((c.occ+c.dis)/tot*100)}%`,dis:'오늘 퇴원',adm:`오늘 ${c.adm}명 입원`,cln:'1~2시간 후 사용',emp:'바로 배정'}[k]}</div></button>`).join('')}</div></div></div></div>
+  <div class="grid g-main" style="margin-bottom:16px">
+    <div class="card"><div class="card-h"><div><h2>병실 배치도</h2><div class="sub">빈 병상을 누르면 배정, 환자를 누르면 상세로 이동합니다</div></div><a class="link" href="#beds">크게 보기</a></div><div class="board ${S.boardF?'filtering':''}" id="board">${boardHTML()}</div>${LEGEND}</div>
+    <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
+      <div class="card"><div class="card-h"><div><h2>진료과별 입원 환자</h2><div class="sub" id="dept-sub"></div></div></div><div class="stack" id="dept-stack" style="height:12px;margin-bottom:10px"></div><div id="dept-list"></div><div class="dept-sub" id="dept-mini"></div></div>
+      <div class="card"><div class="card-h"><div><h2>오늘 남은 병동 일정</h2><div class="sub">${hm(now())} 이후, 시간 순서</div></div></div><div id="today-list"></div></div>
+    </div></div>
+  <div class="card" style="margin-bottom:16px"><div class="card-h"><div><h2>입퇴원 · 수술 · 중환자실 이동</h2><div class="sub" id="trend-sub"></div></div><div class="seg" id="period"><button aria-pressed="${S.period==='w'}" data-period="w">주간</button><button aria-pressed="${S.period==='m'}" data-period="m">월간</button></div></div>
+    <div class="grid g-3">
+      <div><h3>입원 · 퇴원</h3><div class="kpi-line" id="k-io"></div><div class="legend" style="margin-bottom:6px"><span><i style="background:var(--s1)"></i>입원</span><span><i style="background:var(--s2)"></i>퇴원</span></div><div class="chart" id="c-io"></div></div>
+      <div><h3>수술</h3><div class="kpi-line" id="k-op"></div><div class="legend" style="margin-bottom:6px"><span><i style="background:var(--s1)"></i>수술 건수</span></div><div class="chart" id="c-op"></div></div>
+      <div><h3>중환자실 이동</h3><div class="kpi-line" id="k-icu"></div><div class="legend" style="margin-bottom:6px"><span><i style="background:var(--s1)"></i>병동 → 중환자실</span><span><i style="background:var(--s2)"></i>중환자실 → 병동</span></div><div class="chart" id="c-icu"></div></div>
+    </div></div>
+  <div class="card"><div class="card-h"><div><h2>빈 병상 비교와 예측</h2><div class="sub">예측은 퇴원 예정일과 입원 예약 건수로 계산합니다</div></div></div><div class="cmp" id="cmp"></div>
+    <div class="grid g-fc"><div><div class="legend" style="margin-bottom:8px"><span><i style="background:var(--s1)"></i>2026년 10월 실제</span><span><i style="background:transparent;border:1.5px dashed var(--s1)"></i>예측 (범위 음영)</span><span><i style="background:var(--ly)"></i>2025년 10월</span></div><div class="chart" id="c-fc"></div></div>
+    <div><h3 style="margin-bottom:6px">앞으로 7일</h3><table class="fc-table" id="fc-table"></table></div></div></div>`;
+  bindBoard($('#board'));renderDept();renderToday();renderTrend();renderFc();
+}
+function renderDept(){
+  const c={};W.patients.forEach(p=>c[p.dept]=(c[p.dept]||0)+1);
+  const tot=W.patients.length,ks=Object.keys(DEPT).filter(k=>c[k]),sorted=[...ks].sort((a,b)=>c[b]-c[a]),max=Math.max(...ks.map(k=>c[k]));
+  $('#dept-sub').textContent=`재원 ${tot}명, ${ks.length}개 진료과`;
+  $('#dept-stack').innerHTML=sorted.map(k=>`<span style="width:${c[k]/tot*100}%;background:var(${DEPT[k].c})"></span>`).join('');
+  $('#dept-list').innerHTML=sorted.map(k=>`<div class="dept-row"><div class="nm"><i style="background:var(${DEPT[k].c})"></i>${DEPT[k].n} <small>${k}</small></div><div class="track"><span style="width:${c[k]/max*100}%;background:var(${DEPT[k].c})"></span></div><div class="v num">${c[k]}명<small>${Math.round(c[k]/tot*100)}%</small></div></div>`).join('');
+  const top=sorted[0];
+  $('#dept-mini').innerHTML=`<div class="mini"><div class="k">평균 재원일</div><div class="v num">${(W.patients.reduce((s,p)=>s+p.hd,0)/tot).toFixed(1)}일</div></div><div class="mini"><div class="k">${DEPT[top].n} 비중</div><div class="v num">${Math.round(c[top]/tot*100)}%</div></div><div class="mini"><div class="k">오늘 수술</div><div class="v num">${W.patients.filter(p=>p.opToday).length}명</div></div>`;
+}
+function renderToday(){
+  const ev=[];
+  W.patients.forEach(p=>{if(p.opToday){const t=(p.reasons.find(x=>x.startsWith('오늘 수술'))||'').match(/\d\d:\d\d/);ev.push({t:t?t[0]:'14:00',k:'수술',b:'b-warn',w:`${p.bed.id} ${nm(p)}`,s:`${DEPT[p.dept].n} · ${p.dx}`,h:pLink(p)})}});
+  W.incoming.forEach(b=>ev.push({t:b.inc.eta.includes(':')?b.inc.eta:'대기',k:'입원',b:'b-info',w:`${b.id} ${nmS(b.inc.name)}`,s:`${DEPT[b.inc.dept].n} · ${b.inc.route}`,h:'#admission'}));
+  const dl=W.patients.filter(p=>p.disPlan==='오늘');
+  if(dl.length)ev.push({t:'15:00',k:'퇴원',b:'b-mute',w:`퇴원 ${dl.length}명`,s:dl.map(p=>p.bed.id).join(', '),h:'#admission'});
+  ev.sort((a,b)=>a.t.localeCompare(b.t));
+  $('#today-list').innerHTML=ev.map(e=>`<a class="ev" href="${e.h}" style="text-decoration:none;color:inherit"><span class="t">${e.t}</span><div style="min-width:0"><div>${e.w}</div><div class="s">${e.s}</div></div><span class="badge ${e.b}">${e.k}</span></a>`).join('')||'<div class="sub">남은 일정이 없어요</div>';
+}
+function delta(cur,prev,unit){const d=cur-prev,pct=prev?Math.round(d/prev*100):0;return `<span class="d up">${S.period==='w'?'지난주':'8월'}보다 ${d>=0?'+':''}${d}${unit} (${d>=0?'+':''}${pct}%)</span>`}
+function renderTrend(){
+  const w=S.period==='w',D=w?W.wk:W.mo,sum=a=>a.reduce((s,x)=>s+x,0);
+  $('#trend-sub').textContent=w?'최근 7일, 일별. 오늘은 진행 중인 값':'최근 6개월, 월별. 10월은 7일까지 집계';
+  const c2=w?{adm:sum(D.adm),dis:sum(D.dis),op:sum(D.op),icu:sum(D.icuOut)+sum(D.icuIn)}:{adm:D.adm[4],dis:D.dis[4],op:D.op[4],icu:D.icuOut[4]+D.icuIn[4]};
+  const p2=w?W.prevW:{adm:D.adm[3],dis:D.dis[3],op:D.op[3],icu:D.icuOut[3]+D.icuIn[3]};
+  const tag=w?'최근 7일':'9월';
+  $('#k-io').innerHTML=`<span class="v num">${c2.adm}<span style="color:var(--t3);font-weight:500"> / </span>${c2.dis}</span><span class="sub">${tag} 입원 / 퇴원</span>`;
+  $('#k-op').innerHTML=`<span class="v num">${c2.op}건</span>${delta(c2.op,p2.op,'건')}`;
+  $('#k-icu').innerHTML=`<span class="v num">${c2.icu}건</span>${delta(c2.icu,p2.icu,'건')}`;
+  const o={partial:w?6:5};
+  bars($('#c-io'),D.labels,[{n:'입원',c:'--s1',v:D.adm},{n:'퇴원',c:'--s2',v:D.dis}],{...o,aria:'입퇴원 막대 차트'});
+  bars($('#c-op'),D.labels,[{n:'수술',c:'--s1',v:D.op}],{...o,aria:'수술 건수 막대 차트'});
+  bars($('#c-icu'),D.labels,[{n:'병동 → 중환자실',c:'--s1',v:D.icuOut},{n:'중환자실 → 병동',c:'--s2',v:D.icuIn}],{...o,aria:'중환자실 이동 막대 차트'});
+}
+function renderFc(){
+  const tot=W.all.length,thisAvg=W.act.reduce((s,x)=>s+x,0)/W.act.length,lyAvg=W.ly.reduce((s,x)=>s+x,0)/31;
+  const fcAvg=(W.act.reduce((s,x)=>s+x,0)+W.fc.reduce((s,x)=>s+x.v,0))/31,occ=v=>Math.round((tot-v)/tot*100);
+  $('#cmp').innerHTML=`<div class="mini"><div class="k">이번 달 평균 빈 병상 (1~7일)</div><div class="v num">${thisAvg.toFixed(1)}개</div><div class="d">병상 가동률 ${occ(thisAvg)}%</div></div>
+    <div class="mini"><div class="k">지난달(9월) 평균</div><div class="v num">${W.lastMonthAvg.toFixed(1)}개</div><div class="d">이번 달이 ${Math.abs(thisAvg-W.lastMonthAvg).toFixed(1)}개 ${thisAvg>W.lastMonthAvg?'많음':'적음'}</div></div>
+    <div class="mini"><div class="k">전년 동월(2025년 10월) 평균</div><div class="v num">${lyAvg.toFixed(1)}개</div><div class="d">10월 말 예상 평균 ${fcAvg.toFixed(1)}개, 전년보다 ${Math.abs(fcAvg-lyAvg).toFixed(1)}개 ${fcAvg>lyAvg?'많음':'적음'}</div></div>`;
+  const host=$('#c-fc'),W0=Math.max(280,host.clientWidth),H=220,L=30,R=10,T=14,B=24,iw=W0-L-R,ih=H-T-B;
+  const mx=niceMax(Math.max(...W.ly,...W.fc.map(f=>f.hi),...W.act)+1),x=d=>L+(d-1)/30*iw,y=v=>T+ih-v/mx*ih;let g='';
+  [0,mx/2,mx].forEach(t=>{g+=`<line class="${t?'grid-l':'base-l'}" x1="${L}" x2="${W0-R}" y1="${y(t)}" y2="${y(t)}"/><text class="ax" x="${L-6}" y="${y(t)+4}" text-anchor="end">${t}</text>`});
+  [1,8,15,22,29].forEach(d=>g+=`<text class="ax" x="${x(d)}" y="${H-6}" text-anchor="middle">10/${d}</text>`);
+  const band=[[x(7),y(W.act[6])],...W.fc.map(f=>[x(f.d.getDate()),y(f.hi)]),...W.fc.slice().reverse().map(f=>[x(f.d.getDate()),y(f.lo)])];
+  g+=`<path d="M${band.map(p=>p.join(',')).join('L')}Z" fill="var(--s1)" fill-opacity=".12"/>`;
+  g+=`<polyline points="${W.ly.map((v,i)=>x(i+1)+','+y(v)).join(' ')}" fill="none" stroke="var(--ly)" stroke-width="2" stroke-linejoin="round"/>`;
+  g+=`<polyline points="${[[7,W.act[6]],...W.fc.map(f=>[f.d.getDate(),f.v])].map(([d,v])=>x(d)+','+y(v)).join(' ')}" fill="none" stroke="var(--s1)" stroke-width="2" stroke-dasharray="5 4"/>`;
+  g+=`<polyline points="${W.act.map((v,i)=>x(i+1)+','+y(v)).join(' ')}" fill="none" stroke="var(--s1)" stroke-width="2.5" stroke-linejoin="round"/>`;
+  g+=`<line x1="${x(7)}" x2="${x(7)}" y1="${T}" y2="${T+ih}" stroke="var(--t3)" stroke-dasharray="2 3"/><text class="ax" x="${x(7)+5}" y="${T+8}" style="fill:var(--t1);font-weight:700">오늘</text><circle cx="${x(7)}" cy="${y(W.act[6])}" r="4.5" fill="var(--s1)" stroke="var(--surface)" stroke-width="2"/><text class="ax" x="${x(31)}" y="${y(W.ly[30])-8}" text-anchor="end">2025</text>`;
+  g+=`<line id="xh" y1="${T}" y2="${T+ih}" stroke="var(--t3)" opacity="0"/><circle id="xd" r="4" fill="var(--s1)" stroke="var(--surface)" stroke-width="2" opacity="0"/><circle id="xl" r="3.5" fill="var(--ly)" stroke="var(--surface)" stroke-width="2" opacity="0"/><rect id="fc-hit" x="${L}" y="${T}" width="${iw}" height="${ih}" fill="transparent"/>`;
+  host.innerHTML=`<svg viewBox="0 0 ${W0} ${H}" height="${H}" role="img" aria-label="10월 일별 빈 병상 실제와 예측, 전년 동월 비교">${g}</svg>`;
+  const hit=host.querySelector('#fc-hit'),xh=host.querySelector('#xh'),xd=host.querySelector('#xd'),xl=host.querySelector('#xl');
+  hit.addEventListener('mousemove',e=>{const bb=hit.getBoundingClientRect(),d=Math.max(1,Math.min(31,Math.round((e.clientX-bb.left)/bb.width*30)+1));
+    const isA=d<=7,f=W.fc.find(q=>q.d.getDate()===d),v=isA?W.act[d-1]:f.v;
+    xh.setAttribute('x1',x(d));xh.setAttribute('x2',x(d));xh.setAttribute('opacity',.6);xd.setAttribute('cx',x(d));xd.setAttribute('cy',y(v));xd.setAttribute('opacity',1);xl.setAttribute('cx',x(d));xl.setAttribute('cy',y(W.ly[d-1]));xl.setAttribute('opacity',1);
+    showTip(`<b>${md(new Date(2026,9,d))}</b><div class="r"><span><i style="background:var(--s1)"></i>${isA?'실제':'예측'}</span><b>${v}개${isA?'':` (${f.lo}~${f.hi})`}</b></div><div class="r"><span><i style="background:var(--ly)"></i>2025년</span><b>${W.ly[d-1]}개</b></div>${isA?'':`<div style="opacity:.75">퇴원 예정 ${f.outs}, 입원 예약 ${f.ins}</div>`}`,e.clientX,e.clientY)});
+  hit.addEventListener('mouseleave',()=>{[xh,xd,xl].forEach(n=>n.setAttribute('opacity',0));hideTip()});
+  const tight=W.next7.filter(n=>n.v<=1);
+  $('#fc-table').innerHTML=`<thead><tr><th>날짜</th><th class="r">퇴원 예정</th><th class="r">입원 예약</th><th class="r">예상 빈 병상</th></tr></thead><tbody>${W.next7.map(n=>`<tr class="${n.v<=1?'hl':''}"><td>${md(n.d)}</td><td class="r num">${n.outs}</td><td class="r num">${n.ins}</td><td class="r num"><b>${n.v}</b>${n.v<=1?' <span class="badge b-warn">부족</span>':''}</td></tr>`).join('')}</tbody><caption style="caption-side:bottom;text-align:left;font-size:12px;color:var(--t2);padding-top:10px">${tight.length?`${tight.map(t=>md(t.d)).join(', ')}은 빈 병상이 1개 이하로 예상돼요. 예약 입원 조정이나 타 병동 협조를 미리 검토하세요.`:'앞으로 7일 동안 빈 병상이 부족한 날은 없어요.'}</caption>`;
+}
+
+function vPatients(v){
+  const pri=W.patients.filter(p=>p.lv).sort((a,b)=>!!a.ack-!!b.ack||b.lv-a.lv||a.bed.id.localeCompare(b.bed.id));
+  const un=pri.filter(p=>!p.ack).length,dis=W.patients.filter(p=>p.disPlan==='오늘');
+  const dDone=dis.filter(p=>chkN(p.reg)===4).length,aDone=W.incoming.filter(b=>chkN(b.id)===3).length;
+  v.innerHTML=`<div class="h-row"><div><div class="eyebrow">${W.cfg.name} · 재원 ${W.patients.length}명</div><h1>${un?`아직 확인하지 않은 신속 확인 환자가 ${un}명 있어요`:'신속 확인 환자를 모두 확인했어요'}</h1></div></div>
+  <div class="card" style="margin-bottom:16px"><div class="card-h"><div><h2>신속히 확인할 환자</h2><div class="sub">확인하면 처리자와 시각이 남고, 다음 근무조에도 보입니다</div></div><div class="legend"><span class="badge b-crit">즉시</span><span class="badge b-warn">주의</span></div></div>
+  <div class="pri">${pri.map(p=>`<div class="pcard ${p.lv===2?'c':''} ${p.ack?'ack':''}"><div class="top-l">${LV(p)}<span class="mono" style="font-size:12px;color:var(--t2)">${p.bed.id}</span></div>
+    <a class="who" href="${pLink(p)}" style="text-decoration:none;color:inherit">${nm(p)}<small>${sx(p.sex)}/${p.age} · <span class="mono">${p.reg}</span> · ${p.dept}</small></a>
+    <ul>${p.reasons.map(r=>`<li>${r}</li>`).join('')}</ul>
+    <div class="meta"><span>${p.ack?`${p.ack.t} ${p.ack.by} 확인함`:`담당 ${p.nurse}`}</span>${p.ack?`<button class="link" data-act="unack" data-reg="${p.reg}">확인 취소</button>`:`<button class="btn" data-act="ack" data-reg="${p.reg}">확인함</button>`}</div></div>`).join('')||'<div class="empty-st">지금 신속 확인이 필요한 환자가 없어요</div>'}</div></div>
+  <div class="strip"><div class="it"><span>오늘 퇴원 <b>${dis.length}명</b> 중 준비 완료 ${dDone}명</span><span>오늘 입원 <b>${W.incoming.length}명</b> 중 준비 완료 ${aDone}명</span><span>병상 대기 <b>${W.waiting.length}명</b></span></div><a class="btn btn-p" href="#admission">입·퇴원 체크하기</a></div>
+  <div class="h-row" style="margin-bottom:12px"><h2>병실별 입원 환자</h2></div>
+  <div class="toolbar"><div class="seg" id="pf"></div><select class="sel" id="pdept" aria-label="진료과"></select><label class="switch"><input type="checkbox" id="mine" ${S.mine?'checked':''}>내 담당 환자만</label>
+    <div class="search"><svg viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.6"/><path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><input id="q" type="search" placeholder="목록에서 찾기" value="${esc(S.q)}"></div></div>
+  <div class="tbl-wrap"><table class="pt" id="pt"></table></div>`;
+  $('#pdept').onchange=e=>{S.pdept=e.target.value;renderTable()};
+  $('#q').oninput=e=>{S.q=e.target.value;renderTable()};
+  $('#mine').onchange=e=>{S.mine=e.target.checked;renderTable()};
+  renderTable();
+}
+function filtered(){
+  const q=S.q.trim().toLowerCase();
+  return W.patients.filter(p=>{
+    if(S.pf==='pri'&&!p.lv)return false;if(S.pf==='dis'&&p.disPlan!=='오늘')return false;if(S.pf==='tmr'&&(p.disPlan==='-'||p.disPlan==='오늘'))return false;if(S.pf==='new'&&p.hd>1)return false;
+    if(S.pdept!=='all'&&p.dept!==S.pdept)return false;if(S.mine&&p.nurse!==ME)return false;
+    if(q&&!(p.name.includes(q)||p.reg.toLowerCase().includes(q)||p.bed.id.includes(q)||p.dx.toLowerCase().includes(q)))return false;return true});
+}
+const SORTS={room:p=>p.bed.id,name:p=>p.name,age:p=>p.age,adm:p=>p.adm.getTime(),hd:p=>p.hd,lv:p=>-p.lv,dis:p=>p.disPlan==='오늘'?0:p.disPlan==='내일'?1:p.disPlan==='-'?9:2};
+function renderTable(){
+  const ps=W.patients;
+  const fs=[['all','전체',ps.length],['pri','신속 확인',ps.filter(p=>p.lv).length],['dis','오늘 퇴원',ps.filter(p=>p.disPlan==='오늘').length],['tmr','퇴원 예정(내일 이후)',ps.filter(p=>p.disPlan!=='-'&&p.disPlan!=='오늘').length],['new','입원 2일 이내',ps.filter(p=>p.hd<=1).length]];
+  $('#pf').innerHTML=fs.map(([k,l,n])=>`<button data-pf="${k}" aria-pressed="${S.pf===k}">${l}<span class="c num">${n}</span></button>`).join('');
+  $('#pdept').innerHTML=`<option value="all">진료과 전체</option>`+Object.keys(DEPT).filter(k=>ps.some(p=>p.dept===k)).map(k=>`<option value="${k}" ${S.pdept===k?'selected':''}>${DEPT[k].n} (${k})</option>`).join('');
+  const list=filtered(),sk=S.sort.k,sd=S.sort.d;
+  const th=(k,l)=>k?`<th class="sort ${sk===k?'sorted':''}" data-sort="${k}">${l}<span class="ar">${sk===k?(sd>0?'↑':'↓'):'↕'}</span></th>`:`<th>${l}</th>`;
+  const head=`<thead><tr>${th('room','병실-병상')}${th('lv','상태')}${th('name','환자명 (성별/나이)')}${th(null,'생년월일')}${th(null,'등록번호')}${th(null,'진료과 · 주치의')}${th(null,'진단명')}${th('adm','입원일시 / 경과일')}${th('dis','퇴원 예정')}${th(null,'병실 등급')}${th(null,'담당')}${th(null,'표시')}</tr></thead>`;
+  const row=p=>`<tr class="p" data-reg="${p.reg}" tabindex="0"><td class="bed-c">${p.bed.id}</td><td class="lv">${LV(p)}${p.ack?'<span style="color:var(--t3);font-size:11px;margin-left:4px">확인</span>':''}</td>
+    <td><span class="nm">${nm(p)}${p.same?'<span class="same" title="같은 병동에 같은 이름의 환자가 있어요">동명</span>':''}<small>${sx(p.sex)}/${p.age}</small></span></td>
+    <td class="mono">${p.birth}</td><td class="mono"><b>${p.reg}</b></td><td>${DEPT[p.dept].n} <span style="color:var(--t3)">${p.dr}</span></td>
+    <td class="dx">${p.dx}</td><td class="num">${admStr(p)}<span class="hd">+${p.hd}일</span></td>
+    <td>${p.disPlan==='오늘'?'<span class="badge b-warn">오늘</span>':p.disPlan==='-'?'<span style="color:var(--t3)">-</span>':p.disPlan}</td><td>${p.grade}</td><td>${p.nurse}</td><td><div class="flags">${FLAG(p)}</div></td></tr>`;
+  let rows='';
+  if(sk==='room'){
+    const showEmpty=S.pf==='all'&&S.pdept==='all'&&!S.q&&!S.mine;
+    const rooms=sd>0?W.rooms:[...W.rooms].reverse();
+    rooms.forEach(r=>{const inRoom=r.beds.filter(b=>b.p&&list.includes(b.p)||(showEmpty&&!b.p));if(!inRoom.length)return;const g=gOf(r);
+      rows+=`<tr class="grp"><td colspan="12">${r.no}호 · ${r.grade}${g?' · '+sx(g):''}<span>${r.beds.filter(b=>b.p).length}/${r.beds.length} 사용</span></td></tr>`;
+      inRoom.forEach(b=>{rows+=b.p?row(b.p):`<tr class="emp"><td class="bed-c">${b.id}</td><td colspan="11">${b.st==='adm'?`입원 예정 · ${b.inc.eta} ${nmS(b.inc.name)} (${sx(b.inc.sex)}/${b.inc.age}) ${b.inc.route}`:ST[b.st]}</td></tr>`})});
+  }else{const f=SORTS[sk];rows=list.slice().sort((a,b)=>{const x=f(a),y=f(b);return (x>y?1:x<y?-1:0)*sd}).map(row).join('')}
+  $('#pt').innerHTML=head+`<tbody>${rows||`<tr><td colspan="12" class="empty-st">조건에 맞는 환자가 없어요. 필터를 바꾸거나 검색어를 지워 보세요.</td></tr>`}</tbody>`;
+}
+
+function chkHTML(key,steps){return `<div class="chks">${steps.map((s,i)=>{const on=W.chk[key]&&W.chk[key][i];return `<button class="chk" aria-pressed="${!!on}" data-act="chk" data-k="${key}" data-i="${i}" title="${on||''}"><span class="bx">${on?'<svg viewBox="0 0 14 14"><path d="M3 7.2l2.6 2.6L11 4.4" stroke="#fff" stroke-width="2" fill="none"/></svg>':''}</span>${s}</button>`}).join('')}</div>`}
+function vAdmission(v){
+  const dis=W.patients.filter(p=>p.disPlan==='오늘').sort((a,b)=>a.bed.id.localeCompare(b.bed.id));
+  const inc=W.incoming.slice().sort((a,b)=>a.inc.eta.localeCompare(b.inc.eta));
+  const left=dis.filter(p=>chkN(p.reg)<4).length+inc.filter(b=>chkN(b.id)<3).length;
+  v.innerHTML=`<div class="h-row"><div><div class="eyebrow">${W.cfg.name} · ${md(now())}</div><h1>${left?`오늘 입·퇴원 ${dis.length+inc.length}건 중 ${left}건이 준비 중이에요`:'오늘 입·퇴원 준비를 모두 마쳤어요'}</h1></div></div>
+  <div class="io" style="margin-bottom:16px">
+    <div class="card"><div class="card-h"><div><h2>오늘 퇴원 예정 ${dis.length}명</h2><div class="sub">4단계를 모두 마치면 퇴원 처리할 수 있어요. 퇴원 처리하면 병상은 정리 중으로 바뀝니다</div></div></div>
+      ${dis.map(p=>{const n=chkN(p.reg);return `<div class="io-row"><div><a class="who" href="${pLink(p)}" style="text-decoration:none;color:inherit">${nm(p)}<small>${sx(p.sex)}/${p.age} · <span class="mono">${p.reg}</span></small></a><div class="ln"><span class="mono">${p.bed.id}</span> · ${DEPT[p.dept].n} ${p.dr} · 입원 ${p.hd+1}일째</div>${chkHTML(p.reg,DSTEPS)}</div>
+        <div class="io-act"><div class="prog ${n===4?'done':''}">${n}/4<small>진행</small></div><button class="btn ${n===4?'btn-p':''}" data-act="discharge" data-reg="${p.reg}" ${n===4?'':'disabled'}>퇴원 처리</button></div></div>`}).join('')||'<div class="empty-st">남은 퇴원 예정 환자가 없어요</div>'}</div>
+    <div class="card"><div class="card-h"><div><h2>오늘 입원 예정 ${inc.length}명</h2><div class="sub">환자가 병동에 도착하고 3단계를 마치면 입원 완료로 처리합니다</div></div></div>
+      ${inc.map(b=>{const i=b.inc,n=chkN(b.id);return `<div class="io-row"><div><div class="who">${nmS(i.name)}<small>${sx(i.sex)}/${i.age} · <span class="mono">${i.reg}</span></small></div><div class="ln"><b style="color:var(--t1)">${i.eta}</b>${i.eta.includes(':')?' 도착 예정':''} · <span class="mono">${b.id}</span> · ${DEPT[i.dept].n} · ${i.route}${i.route.includes('전동')?' <span class="badge b-warn">인계 필요</span>':''}${i.iso?' <span class="badge b-mute">'+i.iso+'</span>':''}</div>${chkHTML(b.id,ASTEPS)}</div>
+        <div class="io-act"><div class="prog ${n===3?'done':''}">${n}/3<small>진행</small></div><button class="btn ${n===3?'btn-p':''}" data-act="arrive" data-bed="${b.id}" ${n===3?'':'disabled'}>입원 완료</button></div></div>`}).join('')||'<div class="empty-st">남은 입원 예정 환자가 없어요</div>'}
+      ${W.waiting.length?`<div class="strip" style="margin:14px 0 0;background:var(--surface-2);border:0"><span style="font-size:13px">병상을 기다리는 환자가 <b>${W.waiting.length}명</b> 있어요</span><a class="btn" href="#beds">병상 배정하기</a></div>`:''}</div>
+  </div>
+  <div class="card"><div class="card-h"><div><h2>오늘 처리 완료</h2><div class="sub">이 화면에서 처리한 입원·퇴원 기록</div></div></div><div class="done-l">${W.done.length?W.done.slice().reverse().map(d=>`<div><span class="mono" style="color:var(--t3)">${d.at}</span><span class="badge ${d.k==='입원'?'b-info':'b-mute'}">${d.k}</span><span>${nmS(d.name)} · <span class="mono">${d.bed}</span></span></div>`).join(''):'<div style="color:var(--t3)">아직 처리한 입·퇴원이 없어요</div>'}</div></div>`;
+}
+function vBeds(v){
+  const c=counts(),cl=W.all.filter(b=>b.st==='cln');
+  v.innerHTML=`<div class="h-row"><div><div class="eyebrow">${W.cfg.name} · ${W.all.length}병상</div><h1>빈 병상 ${c.emp}개, 병상을 기다리는 환자 ${W.waiting.length}명</h1></div>
+    <div class="seg">${['occ','dis','adm','cln','emp'].map(k=>`<button data-f="${k}" aria-pressed="${S.boardF===k}">${ST[k]}<span class="c num">${c[k]}</span></button>`).join('')}</div></div>
+  <div class="grid g-beds">
+    <div class="card"><div class="card-h"><div><h2>병실 배치도</h2><div class="sub">빈 병상을 누르면 배정, 정리 중 병상을 누르면 정리 완료 처리합니다</div></div></div><div class="board lg ${S.boardF?'filtering':''}" id="board">${boardHTML(true)}</div>${LEGEND}</div>
+    <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
+      <div class="card"><div class="card-h"><div><h2>병상 대기 ${W.waiting.length}명</h2><div class="sub">응급실, 외래, 타 병동에서 병상을 요청한 환자</div></div></div><div class="wl">${W.waiting.map(w=>`<div class="wl-row"><div><b>${nmS(w.name)}</b> <span class="s">${sx(w.sex)}/${w.age} · ${DEPT[w.dept].n}</span><div class="s">${w.from} · ${w.wait}${w.iso?` · <span style="color:var(--warn-ink)">${w.iso}</span>`:''}</div></div><button class="btn btn-p" data-act="assignw" data-wid="${w.wid}">배정</button></div>`).join('')||'<div class="sub">대기 중인 환자가 없어요</div>'}</div></div>
+      <div class="card"><div class="card-h"><div><h2>정리 중 ${cl.length}개</h2><div class="sub">정리가 끝나면 빈 병상으로 바꿔 주세요</div></div></div><div class="wl">${cl.map(b=>`<div class="wl-row"><div><b class="mono">${b.id}</b> <span class="s">${b.room.grade}</span></div><button class="btn" data-act="clean" data-bed="${b.id}">정리 완료</button></div>`).join('')||'<div class="sub">정리 중인 병상이 없어요</div>'}</div></div>
+    </div></div>`;
+  bindBoard($('#board'));
+}
+function vitalsOf(p){
+  const r=rng(parseInt(p.reg.slice(1))||7),last={hr:p.news>=7?124:p.news>=5?110+(p.age%8):76+(p.age%10),sbp:p.news>=7?92:p.news>=5?104:118+(p.age%14),bt:p.news>=5?38.1+(p.age%3)/10:36.6+(p.age%4)/10,spo:p.news>=7?91:p.news>=5?94:97+(p.age%3)};
+  const ts=[['10/5','06'],['10/5','14'],['10/5','22'],['10/6','06'],['10/6','14'],['10/6','22'],['10/7','06'],['10/7','10']];
+  const n=ts.length,mk=(k,base,sp,dec)=>ts.map((t,i)=>{const f=i/(n-1);let v=base*(1-f)+last[k]*f+(r()-.5)*sp;if(i===n-1)v=last[k];v=dec?Math.round(v*10)/10:Math.round(v);return {v,t:`${t[0]} ${t[1]}:00`,day:t[1]==='06'?t[0]:''}});
+  return {hr:mk('hr',80,8),sbp:mk('sbp',122,10),bt:mk('bt',36.7,.4,1),spo:mk('spo',97,2),last};
+}
+function vPatient(v,reg){
+  const p=pByReg(reg);
+  if(!p){v.innerHTML=`<a class="back" href="#patients">← 환자 현황</a><div class="card empty-st">이 병동에서 ${esc(reg)} 환자를 찾을 수 없어요. 퇴원했거나 다른 병동 환자일 수 있어요.</div>`;return}
+  const vt=vitalsOf(p),L=vt.last;
+  const notes=[];
+  notes.push({t:'10:00',x:`바이탈 측정. NEWS2 ${p.news}점${p.news>=5?', 담당의 '+p.dr+' 보고':''}`,w:p.nurse});
+  if(p.lab)notes.push({t:'09:20',x:`검사실 이상치 보고 (${p.lab}). 담당의 ${p.dr} 보고, 재검 오더 받음`,w:p.nurse});
+  if(p.opToday)notes.push({t:'08:30',x:'수술 전 금식 확인, 수술 동의서 확인, 수술 전 투약 완료',w:p.nurse});
+  if(p.postOp)notes.push({t:'07:40',x:'수술 부위 드레싱 상태 양호, 출혈 없음. 통증 NRS 4점, 진통제 투여',w:'이수진'});
+  if(p.fall)notes.push({t:'07:20',x:'낙상 고위험. 침상 난간 올림, 호출벨 위치 교육',w:'이수진'});
+  notes.push({t:'06:00',x:'Night 근무 바이탈 측정, 수면 양호',w:'최예린'});
+  notes.push({t:'09:00',x:`${DEPT[p.dept].n} 회진. ${p.disPlan==='-'?'치료 계획 유지':'퇴원 예정 '+p.disPlan+' 설명'}`,w:p.dr+' (의사)'});
+  notes.sort((a,b)=>b.t.localeCompare(a.t));
+  v.innerHTML=`<a class="back" href="#patients">← 환자 현황</a>
+  <div class="card" style="margin-bottom:16px"><div class="pd-head"><div><div class="eyebrow"><span class="mono">${p.bed.id}</span> · ${p.grade} · ${DEPT[p.dept].n} ${p.dr} · 담당 ${p.nurse}</div>
+    <div class="pd-name">${nm(p)}<small>${sx(p.sex)}/${p.age}세</small>${p.same?'<span class="same">동명이인 주의, 등록번호로 확인</span>':''}</div>
+    <div class="idpair"><div><div class="k">등록번호</div><div class="v mono">${p.reg}</div></div><div><div class="k">생년월일</div><div class="v mono">${p.birth}</div></div><div><div class="k">입원일시</div><div class="v num">${admStr(p)} <span style="color:var(--t3);font-weight:500">+${p.hd}일</span></div></div><div><div class="k">퇴원 예정</div><div class="v">${p.disPlan==='-'?'미정':p.disPlan}</div></div></div></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">${p.lv&&!p.ack?`<button class="btn btn-p" data-act="ack" data-reg="${p.reg}">확인함</button>`:''}${p.ack?`<span class="badge b-ok" style="align-self:center">${p.ack.t} ${p.ack.by} 확인함</span>`:''}<button class="btn" data-act="displan" data-reg="${p.reg}">퇴원 예정 지정</button></div></div></div>
+  <div class="grid g-pd">
+    <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
+      ${p.reasons.length?`<div class="card" style="${p.lv===2?'border-color:color-mix(in srgb,var(--crit) 40%,var(--line))':''}"><div class="card-h"><h2>확인이 필요한 이유</h2>${LV(p)}</div><ul style="margin:0;padding-left:18px">${p.reasons.map(r=>`<li>${r}</li>`).join('')}</ul></div>`:''}
+      <div class="card"><h2 style="margin-bottom:12px">입원 정보</h2><dl class="kv"><dt>진단명</dt><dd>${p.dx}</dd><dt>진료과</dt><dd>${DEPT[p.dept].n} (${p.dept})</dd><dt>주치의</dt><dd>${p.dr}</dd><dt>병실</dt><dd>${p.bed.id} · ${p.grade}</dd><dt>담당 간호사</dt><dd>${p.nurse}</dd><dt>표시</dt><dd><div class="flags">${FLAG(p)||'<span style="color:var(--t3)">없음</span>'}</div></dd></dl></div>
+      <div class="card"><h2 style="margin-bottom:8px">오늘 일정</h2><div>${[['09:00','회진 완료'],...(p.opToday?[['13:50','수술실 이송'],['14:30','수술']]:[]),['14:00','정규 투약'],...(p.disPlan==='오늘'?[['15:00','퇴원 교육 후 퇴원']]:[['18:00','바이탈 측정']])].sort().map(([t,s])=>`<div class="ev" style="grid-template-columns:52px 1fr"><span class="t">${t}</span><span>${s}</span></div>`).join('')}</div></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
+      <div class="card"><div class="card-h"><div><h2>바이탈 추이</h2><div class="sub">최근 3일 · 연한 초록 영역은 정상 범위 · 마지막 측정 10:00 · NEWS2 ${p.news}점</div></div></div>
+        <div class="vgrid"><div><h3>맥박 <span class="num">${L.hr}회/분</span></h3><div class="chart" id="v-hr"></div></div><div><h3>수축기 혈압 <span class="num">${L.sbp} mmHg</span></h3><div class="chart" id="v-sbp"></div></div><div><h3>체온 <span class="num">${L.bt.toFixed(1)}℃</span></h3><div class="chart" id="v-bt"></div></div><div><h3>산소포화도 <span class="num">${L.spo}%</span></h3><div class="chart" id="v-spo"></div></div></div></div>
+      <div class="card"><h2 style="margin-bottom:6px">간호 기록</h2><div class="notes">${notes.map(n=>`<div class="note"><span class="t">10/7 ${n.t}</span><div>${n.x}<div class="w">${n.w}</div></div></div>`).join('')}</div></div>
+    </div></div>`;
+  vline($('#v-hr'),vt.hr,{n:'맥박',u:'회/분',min:60,max:130,nlo:60,nhi:100});
+  vline($('#v-sbp'),vt.sbp,{n:'수축기 혈압',u:' mmHg',min:85,max:140,nlo:100,nhi:140});
+  vline($('#v-bt'),vt.bt,{n:'체온',u:'℃',min:36,max:39,nlo:36.1,nhi:38});
+  vline($('#v-spo'),vt.spo,{n:'산소포화도',u:'%',min:88,max:100,nlo:95,nhi:100});
+}
+function vNotes(v){v.innerHTML=$('#tpl-notes').innerHTML}
+
+/* ─── router + chrome ─── */
+function route(){const h=(location.hash||'').slice(1);if(h.startsWith('patient-'))return {r:'patient',reg:h.slice(8)};return {r:VIEWS[h]?h:'dashboard'}}
+function go(h){if(location.hash.slice(1)===h)render();else location.hash=h}
+function render(){
+  const {r,reg}=route(),v=$('#view');
+  document.documentElement.toggleAttribute('data-theme',!!S.theme);if(S.theme)document.documentElement.dataset.theme=S.theme;
+  $('#dark').checked=S.theme==='dark';$('#mask').checked=S.mask;$('#ward').value=S.ward;
+  $('#ward-m').textContent=`${W.cfg.loc} · ${W.all.length}병상`;
+  $$('.nv').forEach(a=>a.classList.toggle('on',a.dataset.r===r||(r==='patient'&&a.dataset.r==='patients')));
+  const un=W.patients.filter(p=>p.lv&&!p.ack).length,io=W.patients.filter(p=>p.disPlan==='오늘').length+W.incoming.length;
+  $('#n-pri').textContent=un||'';$('#n-pri').hidden=!un;$('#n-io').textContent=io||'';$('#n-io').hidden=!io;$('#n-wait').textContent=W.waiting.length?'대기 '+W.waiting.length:'';$('#n-wait').hidden=!W.waiting.length;
+  $('#crumb-w').textContent=W.cfg.name;
+  const p=reg&&pByReg(reg);$('#crumb-t').textContent=r==='patient'?(p?`환자 상세 · ${nm(p)}`:'환자 상세'):VIEWS[r].t;
+  document.title=`${r==='patient'?'환자 상세':VIEWS[r].t} · WardBoard`;
+  const crit=W.patients.filter(p=>p.lv===2&&!p.ack).length;$('#bell-c').textContent=crit+(W.waiting.length?1:0);$('#bell-c').hidden=!(crit+(W.waiting.length?1:0));
+  const y=scrollY,same=v.dataset.r===(r+(reg||''));
+  if(r==='patient')vPatient(v,reg);else VIEWS[r].f(v);
+  v.dataset.r=r+(reg||'');if(same)scrollTo(0,y);
+}
+addEventListener('hashchange',()=>{closeSide();closePops();render();scrollTo(0,0)});
+function closeSide(){$('#side').classList.remove('on');$('#scrim').classList.remove('on')}
+function closePops(){$('#bell-pop').hidden=true;$('#gs-res').hidden=true}
+$('#scrim').onclick=closeSide;
+$('#ward').onchange=e=>{S.ward=e.target.value;S.boardF=null;save();rebuild();render();toast(`${W.cfg.name}로 바꿨어요`,false)};
+$('#mask').onchange=e=>{S.mask=e.target.checked;save();render()};
+$('#dark').onchange=e=>{S.theme=e.target.checked?'dark':'light';save();render()};
+function bell(){
+  const items=[];
+  W.patients.filter(p=>p.lv===2&&!p.ack).forEach(p=>items.push(`<a href="${pLink(p)}"><span class="badge b-crit">즉시</span><div><div>${p.bed.id} ${nm(p)}</div><div class="s">${p.reasons[0]}</div></div></a>`));
+  if(W.waiting.length)items.push(`<a href="#beds"><span class="badge b-warn">병상</span><div><div>병상 대기 ${W.waiting.length}명</div><div class="s">응급실 ${W.waiting.filter(w=>w.from==='응급실').length}명 포함</div></div></a>`);
+  const cl=W.all.filter(b=>b.st==='cln').length;if(cl)items.push(`<a href="#beds"><span class="badge b-mute">정리</span><div><div>정리 중 병상 ${cl}개</div><div class="s">완료되면 빈 병상으로 바꿔 주세요</div></div></a>`);
+  $('#bell-pop').innerHTML=items.join('')||'<div class="emp">새 알림이 없어요</div>';
+}
+/* global search */
+let gsI=0;
+function gsRender(){const q=$('#gs').value.trim().toLowerCase(),box=$('#gs-res');if(!q){box.hidden=true;return}
+  const res=W.patients.filter(p=>p.name.includes(q)||p.reg.toLowerCase().includes(q)||p.bed.id.includes(q)).slice(0,7);gsI=Math.min(gsI,Math.max(0,res.length-1));
+  box.innerHTML=res.map((p,i)=>`<a href="${pLink(p)}" class="${i===gsI?'on':''}"><span class="mono" style="color:var(--t3);font-size:12px">${p.bed.id}</span><div><b>${nm(p)}</b> <span class="s">${sx(p.sex)}/${p.age} · ${p.reg} · ${p.dept}</span></div>${LV(p)}</a>`).join('')||`<div class="emp">"${esc(q)}"에 맞는 환자가 ${W.cfg.name}에 없어요</div>`;box.hidden=false}
+$('#gs').addEventListener('input',()=>{gsI=0;gsRender()});
+$('#gs').addEventListener('focus',gsRender);
+$('#gs').addEventListener('keydown',e=>{const a=$$('#gs-res a');if(e.key==='ArrowDown'){gsI=Math.min(gsI+1,a.length-1);gsRender();e.preventDefault()}if(e.key==='ArrowUp'){gsI=Math.max(gsI-1,0);gsRender();e.preventDefault()}if(e.key==='Enter'&&a[gsI]){location.hash=a[gsI].getAttribute('href');$('#gs').value='';$('#gs').blur();closePops()}if(e.key==='Escape'){$('#gs').blur();closePops()}});
+document.addEventListener('keydown',e=>{if(e.key==='/'&&!/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)){e.preventDefault();$('#gs').focus()}if(e.key==='Escape'){closeModal();closePops();closeSide()}if(e.key==='Enter'&&e.target.matches('tr.p'))go('patient-'+e.target.dataset.reg)});
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.gsearch'))$('#gs-res').hidden=true;
+  if(!e.target.closest('[data-act="bell"],#bell-pop'))$('#bell-pop').hidden=true;
+  if(e.target.closest('#gs-res a')){$('#gs').value=''}
+  const t=e.target.closest('[data-act],[data-f],[data-period],[data-pf],[data-sort],[data-pick],[data-bed].bed,tr.p');if(!t)return;
+  if(t.dataset.pick){if(t.disabled)return;S.sel=t.dataset.pick;$$('#modal .opt').forEach(o=>o.setAttribute('aria-checked',o===t));const ok=$('#m-ok');if(ok)ok.disabled=false;return}
+  if(t.matches('.bed'))return onBed(t.dataset.bed);
+  if(t.matches('tr.p'))return go('patient-'+t.dataset.reg);
+  if(t.dataset.f){S.boardF=S.boardF===t.dataset.f?null:t.dataset.f;return render()}
+  if(t.dataset.period){S.period=t.dataset.period;save();$$('#period button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.period===S.period));return renderTrend()}
+  if(t.dataset.pf){S.pf=t.dataset.pf;return renderTable()}
+  if(t.dataset.sort){const k=t.dataset.sort;S.sort=S.sort.k===k?{k,d:-S.sort.d}:{k,d:1};return renderTable()}
+  const a=t.dataset.act,reg=t.dataset.reg,p=reg&&pByReg(reg);
+  if(a==='menu'){$('#side').classList.add('on');$('#scrim').classList.add('on')}
+  if(a==='mclose')closeModal();
+  if(a==='bell'){bell();$('#bell-pop').hidden=!$('#bell-pop').hidden}
+  if(a==='refresh'){lastSync=Date.now();tick();render();toast('최신 상태로 갱신했어요',false)}
+  if(a==='reset')modal('예시 데이터 초기화','이 브라우저에서 처리한 확인, 체크, 배정, 퇴원 기록을 모두 지우고 처음 상태로 되돌려요.','초기화',()=>{LOG={};save();rebuild();render();toast('처음 상태로 되돌렸어요',false)},{danger:true});
+  if(a==='ack'&&p)act({t:'ack',reg},`${nm(p)} 님을 확인함으로 기록했어요`);
+  if(a==='unack'&&p)act({t:'unack',reg},`${nm(p)} 님 확인을 취소했어요`);
+  if(a==='chk'){const k=t.dataset.k,i=+t.dataset.i,on=!(W.chk[k]&&W.chk[k][i]),steps=pByReg(k)?DSTEPS:ASTEPS;act({t:'chk',k,i,on},`${steps[i]} ${on?'완료로 체크했어요':'체크를 해제했어요'}`)}
+  if(a==='discharge'&&p)modal(`${nm(p)} 님 퇴원 처리`,`<span class="mono">${p.bed.id}</span> 병상이 <b>정리 중</b>으로 바뀌고 환자는 재원 목록에서 빠져요. 퇴원 오더, 퇴원약, 수납, 퇴원 교육을 모두 마쳤어요.`,'퇴원 처리',()=>act({t:'discharge',reg},`${nm(p)} 님 퇴원 처리했어요. ${p.bed.id}는 정리 중이에요`));
+  if(a==='arrive'){const b=bedById(t.dataset.bed);modal(`${nmS(b.inc.name)} 님 입원 완료`,`환자가 <span class="mono">${b.id}</span> 병상에 도착했나요? 완료하면 재원 환자 목록에 추가되고, 초기 간호 평가 전까지 주의 환자로 표시돼요.`,'입원 완료',()=>act({t:'arrive',bed:b.id},`${nmS(b.inc.name)} 님 입원 완료했어요`))}
+  if(a==='assignw')assignFromWaiting(t.dataset.wid);
+  if(a==='clean')onBed(t.dataset.bed);
+  if(a==='displan'&&p){S.sel=null;const opts=['오늘','내일',md(addD(now(),2)),md(addD(now(),3)),'-'];
+    modal(`${nm(p)} 님 퇴원 예정 지정`,opts.map(o=>`<button class="opt" data-pick="${o}" aria-checked="${p.disPlan===o}"><span class="rd"></span><div><b>${o==='-'?'미정':o}</b>${o==='오늘'?'<div class="s">병상 상태가 퇴원 예정으로 바뀌고 오늘 입·퇴원 체크에 추가돼요</div>':''}</div><span></span></button>`).join(''),'저장',()=>{const vv=S.sel;if(vv&&vv!==p.disPlan)act({t:'displan',reg,v:vv},`퇴원 예정을 ${vv==='-'?'미정':vv}(으)로 지정했어요`)})}
+});
+function tick(){const n=now();$('#clk').innerHTML=`${n.getMonth()+1}월 ${n.getDate()}일(${WD[n.getDay()]}) <b class="mono">${hm(n)}</b>`;const s=Math.round((Date.now()-lastSync)/1000);$('#upd').textContent=s<10?'방금 갱신':s<60?`${s}초 전 갱신`:`${Math.floor(s/60)}분 전 갱신`}
+setInterval(tick,1000);
+let rt;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(route().r==='dashboard'){renderTrend();renderFc()}else if(route().r==='patient')render()},150)});
+rebuild();tick();render();
+
+})();
+</script>
+</body>
+</html>
