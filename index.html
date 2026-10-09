@@ -16,40 +16,46 @@
 
 /* Layout: 상단 고정 바 + 3개 뷰(설계 노트 / 병동 대시보드 / 환자 현황). 위에서 아래로 "오늘 → 추세 → 예측" 순서 */
 :root{
-  --bg:#F3F5F8; --surface:#FFFFFF; --surface-2:#F6F8FB; --line:#E2E7EE; --line-2:#EDF0F4;
-  --t1:#121821; --t2:#4E5A68; --t3:#8691A0;
-  --accent:#1F63D6; --accent-soft:#E7EFFC; --accent-ink:#164EAF;
-  --crit:#D42F2F; --crit-soft:#FDEBEB; --crit-ink:#B42121;
-  --warn:#D9770B; --warn-soft:#FFF3E1; --warn-ink:#A85A00;
-  --ok:#14885A; --ok-soft:#E3F5EC; --ok-ink:#0E6E48;
-  --muted-fill:#E9EDF2;
-  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --s5:#e87ba4; --s6:#8a94a3;
-  --ly:#A9B2BE;
+  --bg:#F2F4F6; --surface:#FFFFFF; --surface-2:#F9FAFB; --line:#E5E8EB; --line-2:#F2F4F6;
+  --t1:#191F28; --t2:#4E5968; --t3:#8B95A1;
+  --accent:#3182F6; --accent-soft:#E8F3FF; --accent-ink:#1B64DA;
+  --brand:#FFCD00; --brand-soft:#FFF8D9; --brand-ink:#7A5D00; --brand-hover:#F5C300; --on-brand:#191F28;
+  --crit:#F04452; --crit-soft:#FFEEEF; --crit-ink:#D22030;
+  --warn:#FF6B1A; --warn-soft:#FFF0E6; --warn-ink:#D14C00;
+  --ok:#03B26C; --ok-soft:#E5F8EF; --ok-ink:#028450;
+  --muted-fill:#EEF0F3; --occ:#333D4B;
+  --s1:#3182F6; --s2:#FFCD00;
+  --d1:#FFC800; --d2:#3182F6; --d3:#00BFA5; --d4:#8B5CF6; --d5:#8B95A1;
+  --ly:#C3CAD2;
   --font:'Pretendard','IBM Plex Sans KR','Apple SD Gothic Neo','Noto Sans KR',system-ui,sans-serif;
   --mono:'IBM Plex Mono','SF Mono',ui-monospace,Menlo,monospace;
   --r-lg:16px; --r-md:12px; --r-sm:8px;
 }
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
-  --bg:#0E1217; --surface:#161B22; --surface-2:#1B212A; --line:#2A313B; --line-2:#222831;
-  --t1:#EEF1F5; --t2:#AAB3BF; --t3:#76808D;
-  --accent:#5B93F0; --accent-soft:#1C2C46; --accent-ink:#8DB4F6;
-  --crit:#F06464; --crit-soft:#3A1E21; --crit-ink:#FF8E8E;
-  --warn:#F0A040; --warn-soft:#3A2B17; --warn-ink:#F7BC6E;
-  --ok:#3CC08A; --ok-soft:#173227; --ok-ink:#6FD8AA;
-  --muted-fill:#262D37;
-  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#76808D;
-  --ly:#5B6573; color-scheme:dark;
+  --bg:#101215; --surface:#17191C; --surface-2:#1E2125; --line:#2C3036; --line-2:#23272C;
+  --t1:#F2F4F6; --t2:#B0B8C1; --t3:#7E8894;
+  --accent:#4C96FF; --accent-soft:#15284A; --accent-ink:#8BBBFF;
+  --brand:#FFD43B; --brand-soft:#3A3214; --brand-ink:#FFD84D; --brand-hover:#FFDD66; --on-brand:#191F28;
+  --crit:#FF5C68; --crit-soft:#3D1C20; --crit-ink:#FF8C95;
+  --warn:#FF8A3D; --warn-soft:#3D2615; --warn-ink:#FFAA70;
+  --ok:#1FCB85; --ok-soft:#123426; --ok-ink:#5EDDA8;
+  --muted-fill:#2A2E34; --occ:#C7CDD4;
+  --s1:#4C96FF; --s2:#FFD43B;
+  --d1:#FFD43B; --d2:#4C96FF; --d3:#1FD1B8; --d4:#A07CFF; --d5:#7E8894;
+  --ly:#4E5560; color-scheme:dark;
 }}
 :root[data-theme="dark"]{
-  --bg:#0E1217; --surface:#161B22; --surface-2:#1B212A; --line:#2A313B; --line-2:#222831;
-  --t1:#EEF1F5; --t2:#AAB3BF; --t3:#76808D;
-  --accent:#5B93F0; --accent-soft:#1C2C46; --accent-ink:#8DB4F6;
-  --crit:#F06464; --crit-soft:#3A1E21; --crit-ink:#FF8E8E;
-  --warn:#F0A040; --warn-soft:#3A2B17; --warn-ink:#F7BC6E;
-  --ok:#3CC08A; --ok-soft:#173227; --ok-ink:#6FD8AA;
-  --muted-fill:#262D37;
-  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#76808D;
-  --ly:#5B6573; color-scheme:dark;
+  --bg:#101215; --surface:#17191C; --surface-2:#1E2125; --line:#2C3036; --line-2:#23272C;
+  --t1:#F2F4F6; --t2:#B0B8C1; --t3:#7E8894;
+  --accent:#4C96FF; --accent-soft:#15284A; --accent-ink:#8BBBFF;
+  --brand:#FFD43B; --brand-soft:#3A3214; --brand-ink:#FFD84D; --brand-hover:#FFDD66; --on-brand:#191F28;
+  --crit:#FF5C68; --crit-soft:#3D1C20; --crit-ink:#FF8C95;
+  --warn:#FF8A3D; --warn-soft:#3D2615; --warn-ink:#FFAA70;
+  --ok:#1FCB85; --ok-soft:#123426; --ok-ink:#5EDDA8;
+  --muted-fill:#2A2E34; --occ:#C7CDD4;
+  --s1:#4C96FF; --s2:#FFD43B;
+  --d1:#FFD43B; --d2:#4C96FF; --d3:#1FD1B8; --d4:#A07CFF; --d5:#7E8894;
+  --ly:#4E5560; color-scheme:dark;
 }
 *{box-sizing:border-box}
 html,body{background:var(--bg)}
@@ -91,6 +97,7 @@ h2{font-size:17px;margin:0;font-weight:700;letter-spacing:-.015em}
 h3{font-size:15px;margin:0;font-weight:700}
 .sub{color:var(--t2);font-size:13px}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:20px;min-width:0}
+.card-h .sub{display:none}
 .card-h{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px;flex-wrap:wrap}
 .grid{display:grid;gap:16px}
 .grid>*{min-width:0}
@@ -108,13 +115,15 @@ h3{font-size:15px;margin:0;font-weight:700}
 .b-warn{background:var(--warn-soft);color:var(--warn-ink)}
 .b-ok{background:var(--ok-soft);color:var(--ok-ink)}
 .b-info{background:var(--accent-soft);color:var(--accent-ink)}
+.b-dis{background:var(--brand-soft);color:var(--brand-ink)}
+.b-op{background:color-mix(in srgb,var(--d4) 13%,var(--surface));color:color-mix(in srgb,var(--d4) 80%,var(--t1))}
 .b-mute{background:var(--muted-fill);color:var(--t2)}
 .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--t2)}
 .legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
 .btn{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:7px 12px;font-weight:600;font-size:13px;cursor:pointer;white-space:nowrap}
 .btn:hover{background:var(--surface-2)}
-.btn-p{background:var(--accent);border-color:var(--accent);color:#fff}
-.btn-p:hover{background:var(--accent-ink)}
+.btn-p{background:var(--brand);border-color:var(--brand);color:var(--on-brand)}
+.btn-p:hover{background:var(--brand-hover);border-color:var(--brand-hover)}
 .link{color:var(--accent-ink);font-weight:600;font-size:13px;background:none;border:0;cursor:pointer;padding:0}
 .link:hover{text-decoration:underline}
 
@@ -143,7 +152,7 @@ h3{font-size:15px;margin:0;font-weight:700}
 .room-h{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;margin:0 2px 6px;gap:6px}
 .room-h b{font-size:13px}
 .room-h span{color:var(--t3);white-space:nowrap}
-.room-h .sx-m{color:var(--accent-ink)} .room-h .sx-f{color:#C2457A}
+.room-h .sx-m{color:var(--accent-ink)} .room-h .sx-f{color:#E0447F}
 .beds{display:grid;grid-template-columns:1fr 1fr;gap:4px}
 .beds.one{grid-template-columns:1fr}
 .bed{position:relative;border-radius:7px;padding:5px 6px;min-height:40px;font-size:11px;line-height:1.3;cursor:default;border:1px solid transparent;transition:opacity .15s}
@@ -151,9 +160,9 @@ h3{font-size:15px;margin:0;font-weight:700}
 .bed .nm{font-weight:600;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
 .bed .dp{font-size:10px;opacity:.8}
 .bed.occ{background:var(--surface);border-color:var(--line);color:var(--t1)}
-.bed.dis{background:var(--warn-soft);color:var(--warn-ink)}
+.bed.dis{background:var(--brand-soft);border-color:var(--brand);color:var(--brand-ink)}
 .bed.adm{background:var(--surface);border:1px dashed var(--accent);color:var(--accent-ink)}
-.bed.emp{background:var(--ok-soft);color:var(--ok-ink)}
+.bed.emp{background:var(--ok-soft);border-color:var(--ok);color:var(--ok-ink)}
 .bed.cln{background:repeating-linear-gradient(135deg,var(--muted-fill) 0 5px,var(--surface-2) 5px 10px);color:var(--t2)}
 .bed .dot{position:absolute;top:5px;right:5px;width:7px;height:7px;border-radius:50%}
 .bed .dot.c{background:var(--crit)} .bed .dot.w{background:var(--warn)}
@@ -161,7 +170,7 @@ h3{font-size:15px;margin:0;font-weight:700}
 .bd-legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--t2);margin-top:12px}
 .bd-legend span{display:inline-flex;align-items:center;gap:6px}
 .sw{width:14px;height:10px;border-radius:3px;display:inline-block}
-.sw.occ{background:var(--surface);border:1px solid var(--line)} .sw.dis{background:var(--warn-soft);border:1px solid var(--warn)}
+.sw.occ{background:var(--surface);border:1px solid var(--line)} .sw.dis{background:var(--brand-soft);border:1px solid var(--brand)}
 .sw.adm{border:1px dashed var(--accent)} .sw.emp{background:var(--ok-soft);border:1px solid var(--ok)}
 .sw.cln{background:repeating-linear-gradient(135deg,var(--muted-fill) 0 3px,var(--surface-2) 3px 6px);border:1px solid var(--line)}
 
@@ -200,11 +209,28 @@ h3{font-size:15px;margin:0;font-weight:700}
 .fc-table td{padding:8px 6px;border-bottom:1px solid var(--line-2)}
 .fc-table td.r,.fc-table th.r{text-align:right}
 .fc-table tr.hl td{background:var(--warn-soft)}
-.cmp{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:16px}
-@media (max-width:560px){.cmp{grid-template-columns:1fr}}
+.cmp{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:16px}
+.cmp .mini.hl{background:var(--ok-soft)} .cmp .mini.hl .v{color:var(--ok-ink)}
+@media (max-width:720px){.cmp{grid-template-columns:1fr 1fr}}
 .cmp .mini .v{font-size:22px}
 .cmp .mini .d{font-size:12px;color:var(--t2)}
 
+.alert{display:flex;align-items:center;gap:14px;background:var(--crit-soft);border-radius:14px;padding:14px 18px;margin-bottom:16px;text-decoration:none;color:var(--t1);font-size:15px;flex-wrap:wrap}
+.alert b{color:var(--crit-ink);font-size:16px}
+.alert .go{margin-left:auto;font-weight:700;font-size:14px;color:var(--crit-ink)}
+.alert:hover{background:color-mix(in srgb,var(--crit) 16%,var(--surface))}
+.pulse-r{width:10px;height:10px;border-radius:50%;background:var(--crit);box-shadow:0 0 0 4px color-mix(in srgb,var(--crit) 22%,transparent)}
+.kpis{margin-bottom:16px;padding:22px 22px 14px}
+.kpi-g{display:grid;grid-template-columns:1.3fr repeat(4,minmax(0,1fr));gap:8px;margin-top:16px}
+@media (max-width:900px){.kpi-g{grid-template-columns:repeat(3,minmax(0,1fr))}.kpi.hero{grid-column:1/-1}}
+.kpi{border:0;background:none;text-align:left;align-self:start;padding:10px 12px;border-radius:12px;cursor:pointer;min-width:0}
+.kpi:hover,.kpi[aria-pressed="true"]{background:var(--surface-2)}
+.kpi .k{display:flex;align-items:center;gap:7px;font-size:14px;font-weight:600;color:var(--t2);white-space:nowrap}
+.kpi .k i{width:10px;height:10px;border-radius:3px;flex:none}
+.kpi .v{font-size:36px;font-weight:800;letter-spacing:-.03em;line-height:1.15;margin-top:4px}
+.kpi.hero .v{font-size:52px;color:var(--ok-ink)}
+.kpi .d{font-size:13px;color:var(--t3);margin-top:2px}
+.sub-r{font-size:13px;color:var(--t3);font-weight:600}
 .callout{display:flex;align-items:center;gap:14px;justify-content:space-between;background:var(--crit-soft);border-radius:14px;padding:14px 18px;margin-bottom:16px;flex-wrap:wrap}
 .callout p{margin:0;font-size:14px;color:var(--t1)}
 .callout b{color:var(--crit-ink)}
@@ -242,9 +268,9 @@ h3{font-size:15px;margin:0;font-weight:700}
 .search input{width:100%;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:8px 12px 8px 34px;font:inherit;color:var(--t1)}
 .search svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--t3)}
 .tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r-lg);background:var(--surface)}
-table.pt{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;min-width:1180px}
-.pt th{position:sticky;top:0;background:var(--surface-2);font-size:12px;color:var(--t2);font-weight:600;text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
-.pt td{padding:10px 12px;border-bottom:1px solid var(--line-2);vertical-align:middle;white-space:nowrap}
+table.pt{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;min-width:1040px}
+.pt th{position:sticky;top:0;background:var(--surface-2);font-size:12px;color:var(--t2);font-weight:600;text-align:left;padding:10px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+.pt td{padding:10px 10px;border-bottom:1px solid var(--line-2);vertical-align:middle;white-space:nowrap}
 .pt tbody tr.p{cursor:pointer}
 .pt tbody tr.p:hover td{background:var(--surface-2)}
 .pt tr.grp td{background:var(--bg);font-size:12px;color:var(--t2);font-weight:600;padding:7px 12px}
@@ -253,10 +279,11 @@ table.pt{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;min
 .pt td.bed-c{font-family:var(--mono);font-size:12px;color:var(--t2)}
 .pt .nm{font-weight:700;font-size:14px}
 .pt .nm small{font-weight:500;color:var(--t2);margin-left:6px;font-size:12px}
-.pt .dx{white-space:normal;min-width:200px;max-width:260px;line-height:1.35}
+.pt .dx{white-space:normal;min-width:160px;max-width:240px;line-height:1.35}
 .pt .hd{color:var(--t3);font-size:12px;margin-left:6px}
 .pt .lv{width:56px}
-.flags{display:flex;gap:4px;flex-wrap:wrap}
+.flags{display:flex;gap:4px;flex-wrap:nowrap}
+.pt .birth{display:block;font-family:var(--mono);font-size:12px;color:var(--t3);margin-top:1px}
 .same{font-size:11px;font-weight:700;color:var(--crit-ink);background:var(--crit-soft);border-radius:4px;padding:0 5px;margin-left:6px}
 .empty-st{padding:40px;text-align:center;color:var(--t3)}
 
@@ -348,22 +375,40 @@ table.pt{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;min
 html,body{height:100%}
 .app{display:grid;grid-template-columns:252px minmax(0,1fr);min-height:100vh}
 .side{position:sticky;top:0;height:100vh;overflow:auto;background:var(--surface);border-right:1px solid var(--line);padding:18px 14px;display:flex;flex-direction:column;gap:18px}
-.side .brand{padding:2px 6px}
-.wsel{background:var(--surface-2);border-radius:12px;padding:10px 12px}
-.wsel .k{font-size:11px;color:var(--t3);font-weight:600}
-.wsel select{width:100%;margin-top:4px;border:0;background-color:transparent;padding-left:0;font-size:15px}
-.wsel .m{font-size:12px;color:var(--t2);margin-top:2px}
+.side .brand{padding:4px 8px 0;flex-direction:column;align-items:flex-start;gap:6px}
+.logo{display:block;height:19px;width:auto}
+.lg-d{display:none}
+:root[data-theme="dark"] .lg-l{display:none} :root[data-theme="dark"] .lg-d{display:block}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .lg-l{display:none} :root:not([data-theme="light"]) .lg-d{display:block}}
+.brand .prod{font-size:12px;font-weight:600;color:var(--t3);letter-spacing:0}
+.wsel{position:relative}
+.wsel .k{font-size:11px;color:var(--t3);font-weight:600;padding:0 8px 6px}
+.wbtn{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;text-align:left;border:1px solid var(--line);background:var(--surface-2);border-radius:12px;padding:10px 14px;cursor:pointer;transition:background .12s,border-color .12s}
+.wbtn:hover{background:var(--surface);border-color:var(--t3)}
+.wbtn[aria-expanded="true"]{background:var(--surface);border-color:var(--t1)}
+.wbtn b{display:block;font-size:15px}
+.wbtn .m{display:block;font-size:12px;color:var(--t3);margin-top:1px}
+.wbtn svg{width:12px;height:8px;color:var(--t3);flex:none;transition:transform .15s}
+.wbtn[aria-expanded="true"] svg{transform:rotate(180deg)}
+.wlist{position:absolute;left:0;right:0;top:calc(100% + 6px);background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 32px rgba(16,24,40,.14);padding:6px;z-index:40}
+.wopt{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;border:0;background:none;text-align:left;padding:10px 12px;border-radius:8px;cursor:pointer}
+.wopt:hover{background:var(--surface-2)}
+.wopt b{display:block;font-size:14px}
+.wopt span{display:block;font-size:12px;color:var(--t3)}
+.wopt[aria-selected="true"]{background:var(--brand-soft)}
+.wopt svg{width:14px;height:14px;flex:none;color:var(--t1)}
 .nav{display:flex;flex-direction:column;gap:2px}
 .nav .lbl{font-size:11px;color:var(--t3);font-weight:600;padding:10px 12px 4px}
 .nv{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;color:var(--t2);font-weight:600;text-decoration:none;font-size:14px}
 .nv svg{width:18px;height:18px;flex:none}
 .nv:hover{background:var(--surface-2);color:var(--t1)}
-.nv.on{background:var(--accent-soft);color:var(--accent-ink)}
+.nv.on{background:var(--brand-soft);color:var(--t1)}
+.nv.on svg{color:var(--brand-ink)}
 .nv .cnt{margin-left:auto;font-size:11px;font-weight:700;border-radius:10px;padding:1px 7px;background:var(--muted-fill);color:var(--t2)}
 .nv .cnt.r{background:var(--crit);color:#fff}
 .me{margin-top:auto;border-top:1px solid var(--line);padding-top:14px;display:flex;flex-direction:column;gap:12px}
 .me-h{display:flex;align-items:center;gap:10px}
-.av{width:34px;height:34px;border-radius:50%;background:var(--accent-soft);color:var(--accent-ink);display:grid;place-items:center;font-weight:700}
+.av{width:34px;height:34px;border-radius:50%;background:var(--brand);color:var(--on-brand);display:grid;place-items:center;font-weight:700}
 .me-h b{display:block;font-size:14px}.me-h span{font-size:12px;color:var(--t3)}
 .me .switch{justify-content:space-between}
 .me .reset{border:0;background:none;color:var(--t3);font-size:12px;text-align:left;padding:0;cursor:pointer;text-decoration:underline}
@@ -476,13 +521,11 @@ a.btn.btn-p{color:#fff}
 <body>
 <div class="app">
   <aside class="side" id="side">
-    <div class="brand"><span class="mark"><svg viewBox="0 0 16 16" fill="none"><path d="M6.5 2h3v4.5H14v3H9.5V14h-3V9.5H2v-3h4.5z" fill="#fff"/></svg></span>WardBoard</div>
+    <div class="brand"><img class="logo lg-l" src="logo.png" alt="kakao healthcare" width="176" height="19"><img class="logo lg-d" src="logo-dark.png" alt="" width="176" height="19" aria-hidden="true"><span class="prod">병동 현황판</span></div>
     <div class="wsel">
       <div class="k">근무 병동</div>
-      <select class="sel" id="ward" aria-label="병동 선택">
-        <option value="71">71병동</option><option value="72">72병동</option><option value="81">81병동</option>
-      </select>
-      <div class="m" id="ward-m"></div>
+      <button class="wbtn" id="ward-btn" aria-haspopup="listbox" aria-expanded="false"><span><b id="ward-n"></b><span class="m" id="ward-m"></span></span><svg viewBox="0 0 12 8" fill="none"><path d="M1 1.5l5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="wlist" id="ward-list" role="listbox" hidden></div>
     </div>
     <nav class="nav" id="nav">
       <a class="nv" href="#dashboard" data-r="dashboard"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="6" height="8" rx="1.5"/><rect x="11" y="3" width="6" height="5" rx="1.5"/><rect x="11" y="10" width="6" height="7" rx="1.5"/><rect x="3" y="13" width="6" height="4" rx="1.5"/></svg>대시보드</a>
@@ -644,7 +687,7 @@ a.btn.btn-p{color:#fff}
         <div><div class="k rs">대응</div><p>화면은 판단용과 처리용 2개로만 나누고, 밀도는 그대로 두되 시간 단위로 위아래 순서를 정했습니다. 정상 상태는 회색 글자로 두고 문제가 있는 곳에만 색을 씁니다.</p></div></div>
       <div class="card"><h3>02 진료과 색과 상태 색의 충돌</h3>
         <div><div class="k rk">위험</div><p>진료과마다 색을 주면 6~8가지 색이 병상 배치도와 목록에 섞여, 빨강과 주황이 '위험'인지 '어떤 과'인지 헷갈립니다.</p></div>
-        <div><div class="k rs">대응</div><p>빨강은 즉시 확인, 주황은 오늘 처리할 일에만 씁니다. 진료과 색은 진료과 차트 안에서만 쓰고, 목록과 배치도에서는 OS, GS 같은 진료과 약어 글자로 표시합니다.</p></div></div>
+        <div><div class="k rs">대응</div><p>빨강은 즉시 확인, 주황은 주의 환자에만 씁니다. 노랑은 퇴원, 파랑은 입원으로 병상 배치도와 입퇴원 차트에서 같은 뜻으로 씁니다. 진료과 색은 진료과 차트 안에서만 쓰고, 목록과 배치도에서는 OS, GS 같은 진료과 약어 글자로 표시합니다.</p></div></div>
       <div class="card"><h3>03 모두가 보는 모니터와 개인정보</h3>
         <div><div class="k rk">위험</div><p>스테이션 모니터는 보호자와 방문객 시야에 노출됩니다. 이름과 진단명이 그대로 보이면 개인정보 노출이 됩니다.</p></div>
         <div><div class="k rs">대응</div><p>상단에 '이름 가리기'를 두어 홍*동 형태로 바꿉니다. 병상 배치도는 진단명 없이 진료과 약어만 보여줍니다. 왼쪽 메뉴 아래 스위치로 직접 확인할 수 있습니다.</p></div></div>
@@ -688,11 +731,11 @@ const addD=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
 function rng(seed){let a=seed>>>0;return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
 
 const DEPT={
-  OS:{n:'정형외과',c:'--s1',dr:['김정훈','이도현'],dx:['Fracture of tibia and fibula','Intertrochanteric fracture of femur','Rotator cuff tear, right','Osteoarthritis of knee (TKR)','Distal radius fracture','ACL rupture, left','Lumbar spinal stenosis']},
-  NS:{n:'신경외과',c:'--s2',dr:['박민재'],dx:['Lumbar disc herniation L4-5','Cervical myelopathy','Chronic subdural hematoma','Compression fracture of L1']},
-  GS:{n:'외과',c:'--s3',dr:['정하윤','최우석'],dx:['Acute appendicitis','Acute cholecystitis','Inguinal hernia, right','Sigmoid colon cancer']},
-  IM:{n:'내과',c:'--s4',dr:['한지수','오세훈'],dx:['Community-acquired pneumonia','Acute pyelonephritis','Cellulitis of lower leg','Uncontrolled type 2 diabetes']},
-  RM:{n:'재활의학과',c:'--s5',dr:['윤가람'],dx:['Rehabilitation after stroke','Rehabilitation after TKR']},
+  OS:{n:'정형외과',c:'--d1',dr:['김정훈','이도현'],dx:['Fracture of tibia and fibula','Intertrochanteric fracture of femur','Rotator cuff tear, right','Osteoarthritis of knee (TKR)','Distal radius fracture','ACL rupture, left','Lumbar spinal stenosis']},
+  NS:{n:'신경외과',c:'--d2',dr:['박민재'],dx:['Lumbar disc herniation L4-5','Cervical myelopathy','Chronic subdural hematoma','Compression fracture of L1']},
+  GS:{n:'외과',c:'--d3',dr:['정하윤','최우석'],dx:['Acute appendicitis','Acute cholecystitis','Inguinal hernia, right','Sigmoid colon cancer']},
+  IM:{n:'내과',c:'--d4',dr:['한지수','오세훈'],dx:['Community-acquired pneumonia','Acute pyelonephritis','Cellulitis of lower leg','Uncontrolled type 2 diabetes']},
+  RM:{n:'재활의학과',c:'--d5',dr:['윤가람'],dx:['Rehabilitation after stroke','Rehabilitation after TKR']},
 };
 const WARDS={
   '71':{name:'71병동',loc:'본관 7층 서쪽',base:700,seed:71,w:{OS:.46,NS:.2,GS:.1,IM:.14,RM:.1}},
@@ -837,7 +880,7 @@ const nm=p=>S.mask?(p.name.length>=3?p.name[0]+'*'+p.name.slice(2):p.name[0]+'*'
 const nmS=s=>S.mask?(s.length>=3?s[0]+'*'+s.slice(2):s[0]+'*'):s;
 const sx=s=>s==='M'?'남':'여';
 const ST={occ:'사용 중',dis:'퇴원 예정',adm:'입원 예정',cln:'정리 중',emp:'빈 병상'};
-const STC={occ:'var(--accent)',dis:'var(--warn)',adm:'color-mix(in srgb,var(--accent) 45%,var(--surface))',cln:'var(--ly)',emp:'var(--ok)'};
+const STC={occ:'var(--occ)',dis:'var(--brand)',adm:'var(--accent)',cln:'var(--ly)',emp:'var(--ok)'};
 const DSTEPS=['퇴원 오더','퇴원약','수납','퇴원 교육'], ASTEPS=['병상 준비','입원 안내','초기 오더'];
 
 /* ─── data + actions ─── */
@@ -889,7 +932,7 @@ function closeModal(){$('#mbg').classList.remove('on');mOk=null}
 $('#mbg').addEventListener('click',e=>{if(e.target.id==='mbg')closeModal()});
 function counts(){const c={occ:0,dis:0,adm:0,cln:0,emp:0};W.all.forEach(b=>c[b.st]++);return c}
 const LV=p=>p.lv===2?'<span class="badge b-crit">즉시</span>':p.lv===1?'<span class="badge b-warn">주의</span>':'';
-const FLAG=p=>{const f=[];if(p.fall)f.push('<span class="badge b-mute">낙상 고위험</span>');if(p.isoF)f.push(`<span class="badge b-mute">${p.isoF}</span>`);if(p.npo)f.push('<span class="badge b-mute">금식</span>');if(p.opToday)f.push('<span class="badge b-warn">오늘 수술</span>');return f.join('')};
+const FLAG=(p,max)=>{const f=[];if(p.opToday)f.push('<span class="badge b-op">오늘 수술</span>');if(p.isoF)f.push(`<span class="badge b-mute">${p.isoF}</span>`);if(p.fall)f.push('<span class="badge b-mute">낙상 고위험</span>');if(p.npo)f.push('<span class="badge b-mute">금식</span>');return max&&f.length>max?f.slice(0,max).join('')+`<span class="badge b-mute">+${f.length-max}</span>`:f.join('')};
 const admStr=p=>`${fmtD(p.adm)} ${pad(p.adm.getHours())}:${pad(p.adm.getMinutes())}`;
 const pLink=p=>`#patient-${p.reg}`;
 const chkN=k=>W.chk[k]?Object.keys(W.chk[k]).length:0;
@@ -973,56 +1016,52 @@ function vDash(v){
   const c=counts(),tot=W.all.length,cfg=W.cfg;
   let m=0,f=0,any=0;W.rooms.forEach(r=>{const e=r.beds.filter(b=>b.st==='emp').length;if(!e)return;const g=gOf(r);if(!g)any+=e;else if(g==='M')m+=e;else f+=e});
   const pri=W.patients.filter(p=>p.lv&&!p.ack),crit=pri.filter(p=>p.lv===2);
-  v.innerHTML=`<div class="h-row"><div><div class="eyebrow">${cfg.name} · ${cfg.loc} · ${tot}병상 · 재원 ${W.patients.length}명</div><h1>지금 배정 가능한 병상은 ${c.emp}개, 오늘 오후 ${c.dis+c.cln}개가 더 비어요</h1></div></div>
-  ${pri.length?`<div class="callout"><p><b>즉시 확인 ${crit.length}명</b>, 주의 ${pri.length-crit.length}명을 아직 확인하지 않았어요. ${crit.slice(0,2).map(p=>`${p.bed.id} ${nm(p)} (${p.reasons[0].split(' (')[0]})`).join(', ')}</p><a class="btn" href="#patients">환자 현황에서 확인</a></div>`:''}
-  <div class="card" style="margin-bottom:16px"><div class="sum"><div class="sum-head"><div class="eyebrow">지금 배정 가능</div><div class="big num">${c.emp}<small>병상</small></div>
-    <div class="gender"><span class="badge b-info">남 ${m}</span><span class="badge" style="background:color-mix(in srgb,#C2457A 14%,var(--surface));color:#C2457A">여 ${f}</span>${any?`<span class="badge b-mute">남녀 모두 ${any}</span>`:''}${W.waiting.length?`<a class="badge b-warn" href="#beds" style="text-decoration:none">병상 대기 ${W.waiting.length}명</a>`:''}</div>
-    <p>퇴원 예정 ${c.dis}개와 정리 중 ${c.cln}개는 오후에 빈 병상이 됩니다. 입원 예정 ${c.adm}개는 이미 배정되어 계산에서 뺐어요.</p></div>
-    <div><div class="stack">${['occ','dis','adm','cln','emp'].filter(k=>c[k]).map(k=>`<span style="width:${c[k]/tot*100}%;background:${STC[k]}"></span>`).join('')}</div>
-    <div class="sum-cells">${['occ','dis','adm','cln','emp'].map(k=>`<button class="sum-cell" data-f="${k}" aria-pressed="${S.boardF===k}"><div class="k"><i style="background:${STC[k]}"></i>${ST[k]}</div><div class="v num">${c[k]}</div><div class="d">${{occ:`가동률 ${Math.round((c.occ+c.dis)/tot*100)}%`,dis:'오늘 퇴원',adm:`오늘 ${c.adm}명 입원`,cln:'1~2시간 후 사용',emp:'바로 배정'}[k]}</div></button>`).join('')}</div></div></div></div>
+  const occR=Math.round((c.occ+c.dis)/tot*100);
+  v.innerHTML=`${pri.length?`<a class="alert" href="#patients"><span class="pulse-r"></span><b>즉시 확인 ${crit.length}명</b><span>주의 ${pri.length-crit.length}명</span><span class="go">확인하기 →</span></a>`:''}
+  <div class="card kpis">
+    <div class="stack">${['occ','dis','adm','cln','emp'].filter(k=>c[k]).map(k=>`<span style="width:${c[k]/tot*100}%;background:${STC[k]}"></span>`).join('')}</div>
+    <div class="kpi-g">${['emp','dis','adm','cln','occ'].map(k=>`<button class="kpi ${k==='emp'?'hero':''}" data-f="${k}" aria-pressed="${S.boardF===k}"><div class="k"><i style="background:${STC[k]}"></i>${ST[k]}</div><div class="v num">${c[k]}</div>${k==='emp'?`<div class="d">남 ${m} · 여 ${f}${any?` · 공용 ${any}`:''}</div>`:k==='occ'?`<div class="d">가동률 ${occR}%</div>`:''}</button>`).join('')}</div>
+  </div>
   <div class="grid g-main" style="margin-bottom:16px">
-    <div class="card"><div class="card-h"><div><h2>병실 배치도</h2><div class="sub">빈 병상을 누르면 배정, 환자를 누르면 상세로 이동합니다</div></div><a class="link" href="#beds">크게 보기</a></div><div class="board ${S.boardF?'filtering':''}" id="board">${boardHTML()}</div>${LEGEND}</div>
+    <div class="card"><div class="card-h"><h2>병실 배치도</h2><a class="link" href="#beds">크게 보기</a></div><div class="board ${S.boardF?'filtering':''}" id="board">${boardHTML()}</div>${LEGEND}</div>
     <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
-      <div class="card"><div class="card-h"><div><h2>진료과별 입원 환자</h2><div class="sub" id="dept-sub"></div></div></div><div class="stack" id="dept-stack" style="height:12px;margin-bottom:10px"></div><div id="dept-list"></div><div class="dept-sub" id="dept-mini"></div></div>
-      <div class="card"><div class="card-h"><div><h2>오늘 남은 병동 일정</h2><div class="sub">${hm(now())} 이후, 시간 순서</div></div></div><div id="today-list"></div></div>
+      <div class="card"><div class="card-h"><h2>진료과별 환자</h2><span class="sub-r" id="dept-sub"></span></div><div class="stack" id="dept-stack" style="height:12px;margin-bottom:10px"></div><div id="dept-list"></div></div>
+      <div class="card"><div class="card-h"><h2>오늘 일정</h2></div><div id="today-list"></div></div>
     </div></div>
-  <div class="card" style="margin-bottom:16px"><div class="card-h"><div><h2>입퇴원 · 수술 · 중환자실 이동</h2><div class="sub" id="trend-sub"></div></div><div class="seg" id="period"><button aria-pressed="${S.period==='w'}" data-period="w">주간</button><button aria-pressed="${S.period==='m'}" data-period="m">월간</button></div></div>
+  <div class="card" style="margin-bottom:16px"><div class="card-h"><h2>입퇴원 · 수술 · 중환자실</h2><div class="seg" id="period"><button aria-pressed="${S.period==='w'}" data-period="w">주간</button><button aria-pressed="${S.period==='m'}" data-period="m">월간</button></div></div>
     <div class="grid g-3">
       <div><h3>입원 · 퇴원</h3><div class="kpi-line" id="k-io"></div><div class="legend" style="margin-bottom:6px"><span><i style="background:var(--s1)"></i>입원</span><span><i style="background:var(--s2)"></i>퇴원</span></div><div class="chart" id="c-io"></div></div>
-      <div><h3>수술</h3><div class="kpi-line" id="k-op"></div><div class="legend" style="margin-bottom:6px"><span><i style="background:var(--s1)"></i>수술 건수</span></div><div class="chart" id="c-op"></div></div>
+      <div><h3>수술</h3><div class="kpi-line" id="k-op"></div><div class="legend" style="margin-bottom:6px"><span><i style="background:var(--s1)"></i>수술</span></div><div class="chart" id="c-op"></div></div>
       <div><h3>중환자실 이동</h3><div class="kpi-line" id="k-icu"></div><div class="legend" style="margin-bottom:6px"><span><i style="background:var(--s1)"></i>병동 → 중환자실</span><span><i style="background:var(--s2)"></i>중환자실 → 병동</span></div><div class="chart" id="c-icu"></div></div>
     </div></div>
-  <div class="card"><div class="card-h"><div><h2>빈 병상 비교와 예측</h2><div class="sub">예측은 퇴원 예정일과 입원 예약 건수로 계산합니다</div></div></div><div class="cmp" id="cmp"></div>
-    <div class="grid g-fc"><div><div class="legend" style="margin-bottom:8px"><span><i style="background:var(--s1)"></i>2026년 10월 실제</span><span><i style="background:transparent;border:1.5px dashed var(--s1)"></i>예측 (범위 음영)</span><span><i style="background:var(--ly)"></i>2025년 10월</span></div><div class="chart" id="c-fc"></div></div>
-    <div><h3 style="margin-bottom:6px">앞으로 7일</h3><table class="fc-table" id="fc-table"></table></div></div></div>`;
+  <div class="card"><div class="card-h"><h2>빈 병상 예측</h2></div><div class="cmp" id="cmp"></div>
+    <div class="legend" style="margin-bottom:8px"><span><i style="background:var(--ok)"></i>이번 달</span><span><i style="background:transparent;border:1.5px dashed var(--ok)"></i>예측</span><span><i style="background:var(--ly)"></i>작년 10월</span></div><div class="chart" id="c-fc"></div></div>`;
   bindBoard($('#board'));renderDept();renderToday();renderTrend();renderFc();
 }
 function renderDept(){
   const c={};W.patients.forEach(p=>c[p.dept]=(c[p.dept]||0)+1);
   const tot=W.patients.length,ks=Object.keys(DEPT).filter(k=>c[k]),sorted=[...ks].sort((a,b)=>c[b]-c[a]),max=Math.max(...ks.map(k=>c[k]));
-  $('#dept-sub').textContent=`재원 ${tot}명, ${ks.length}개 진료과`;
+  $('#dept-sub').textContent=`${tot}명`;
   $('#dept-stack').innerHTML=sorted.map(k=>`<span style="width:${c[k]/tot*100}%;background:var(${DEPT[k].c})"></span>`).join('');
   $('#dept-list').innerHTML=sorted.map(k=>`<div class="dept-row"><div class="nm"><i style="background:var(${DEPT[k].c})"></i>${DEPT[k].n} <small>${k}</small></div><div class="track"><span style="width:${c[k]/max*100}%;background:var(${DEPT[k].c})"></span></div><div class="v num">${c[k]}명<small>${Math.round(c[k]/tot*100)}%</small></div></div>`).join('');
-  const top=sorted[0];
-  $('#dept-mini').innerHTML=`<div class="mini"><div class="k">평균 재원일</div><div class="v num">${(W.patients.reduce((s,p)=>s+p.hd,0)/tot).toFixed(1)}일</div></div><div class="mini"><div class="k">${DEPT[top].n} 비중</div><div class="v num">${Math.round(c[top]/tot*100)}%</div></div><div class="mini"><div class="k">오늘 수술</div><div class="v num">${W.patients.filter(p=>p.opToday).length}명</div></div>`;
 }
 function renderToday(){
   const ev=[];
-  W.patients.forEach(p=>{if(p.opToday){const t=(p.reasons.find(x=>x.startsWith('오늘 수술'))||'').match(/\d\d:\d\d/);ev.push({t:t?t[0]:'14:00',k:'수술',b:'b-warn',w:`${p.bed.id} ${nm(p)}`,s:`${DEPT[p.dept].n} · ${p.dx}`,h:pLink(p)})}});
+  W.patients.forEach(p=>{if(p.opToday){const t=(p.reasons.find(x=>x.startsWith('오늘 수술'))||'').match(/\d\d:\d\d/);ev.push({t:t?t[0]:'14:00',k:'수술',b:'b-op',w:`${p.bed.id} ${nm(p)}`,s:`${DEPT[p.dept].n} · ${p.dx}`,h:pLink(p)})}});
   W.incoming.forEach(b=>ev.push({t:b.inc.eta.includes(':')?b.inc.eta:'대기',k:'입원',b:'b-info',w:`${b.id} ${nmS(b.inc.name)}`,s:`${DEPT[b.inc.dept].n} · ${b.inc.route}`,h:'#admission'}));
   const dl=W.patients.filter(p=>p.disPlan==='오늘');
-  if(dl.length)ev.push({t:'15:00',k:'퇴원',b:'b-mute',w:`퇴원 ${dl.length}명`,s:dl.map(p=>p.bed.id).join(', '),h:'#admission'});
+  if(dl.length)ev.push({t:'15:00',k:'퇴원',b:'b-dis',w:`퇴원 ${dl.length}명`,s:dl.map(p=>p.bed.id).join(', '),h:'#admission'});
   ev.sort((a,b)=>a.t.localeCompare(b.t));
-  $('#today-list').innerHTML=ev.map(e=>`<a class="ev" href="${e.h}" style="text-decoration:none;color:inherit"><span class="t">${e.t}</span><div style="min-width:0"><div>${e.w}</div><div class="s">${e.s}</div></div><span class="badge ${e.b}">${e.k}</span></a>`).join('')||'<div class="sub">남은 일정이 없어요</div>';
+  $('#today-list').innerHTML=ev.slice(0,6).map(e=>`<a class="ev" href="${e.h}" style="text-decoration:none;color:inherit"><span class="t">${e.t}</span><div style="min-width:0"><div>${e.w}</div><div class="s">${e.s}</div></div><span class="badge ${e.b}">${e.k}</span></a>`).join('')||'<div class="sub">남은 일정이 없어요</div>';
 }
-function delta(cur,prev,unit){const d=cur-prev,pct=prev?Math.round(d/prev*100):0;return `<span class="d up">${S.period==='w'?'지난주':'8월'}보다 ${d>=0?'+':''}${d}${unit} (${d>=0?'+':''}${pct}%)</span>`}
+function delta(cur,prev,unit){const d=cur-prev,pct=prev?Math.round(d/prev*100):0;return `<span class="d up">${S.period==='w'?'지난주':'8월'} 대비 ${d>=0?'+':''}${d}</span>`}
 function renderTrend(){
   const w=S.period==='w',D=w?W.wk:W.mo,sum=a=>a.reduce((s,x)=>s+x,0);
-  $('#trend-sub').textContent=w?'최근 7일, 일별. 오늘은 진행 중인 값':'최근 6개월, 월별. 10월은 7일까지 집계';
+  if($('#trend-sub'))$('#trend-sub').textContent=w?'최근 7일, 일별. 오늘은 진행 중인 값':'최근 6개월, 월별. 10월은 7일까지 집계';
   const c2=w?{adm:sum(D.adm),dis:sum(D.dis),op:sum(D.op),icu:sum(D.icuOut)+sum(D.icuIn)}:{adm:D.adm[4],dis:D.dis[4],op:D.op[4],icu:D.icuOut[4]+D.icuIn[4]};
   const p2=w?W.prevW:{adm:D.adm[3],dis:D.dis[3],op:D.op[3],icu:D.icuOut[3]+D.icuIn[3]};
   const tag=w?'최근 7일':'9월';
-  $('#k-io').innerHTML=`<span class="v num">${c2.adm}<span style="color:var(--t3);font-weight:500"> / </span>${c2.dis}</span><span class="sub">${tag} 입원 / 퇴원</span>`;
+  $('#k-io').innerHTML=`<span class="v num">${c2.adm}<span style="color:var(--t3);font-weight:500"> / </span>${c2.dis}</span>`;
   $('#k-op').innerHTML=`<span class="v num">${c2.op}건</span>${delta(c2.op,p2.op,'건')}`;
   $('#k-icu').innerHTML=`<span class="v num">${c2.icu}건</span>${delta(c2.icu,p2.icu,'건')}`;
   const o={partial:w?6:5};
@@ -1033,36 +1072,37 @@ function renderTrend(){
 function renderFc(){
   const tot=W.all.length,thisAvg=W.act.reduce((s,x)=>s+x,0)/W.act.length,lyAvg=W.ly.reduce((s,x)=>s+x,0)/31;
   const fcAvg=(W.act.reduce((s,x)=>s+x,0)+W.fc.reduce((s,x)=>s+x.v,0))/31,occ=v=>Math.round((tot-v)/tot*100);
-  $('#cmp').innerHTML=`<div class="mini"><div class="k">이번 달 평균 빈 병상 (1~7일)</div><div class="v num">${thisAvg.toFixed(1)}개</div><div class="d">병상 가동률 ${occ(thisAvg)}%</div></div>
-    <div class="mini"><div class="k">지난달(9월) 평균</div><div class="v num">${W.lastMonthAvg.toFixed(1)}개</div><div class="d">이번 달이 ${Math.abs(thisAvg-W.lastMonthAvg).toFixed(1)}개 ${thisAvg>W.lastMonthAvg?'많음':'적음'}</div></div>
-    <div class="mini"><div class="k">전년 동월(2025년 10월) 평균</div><div class="v num">${lyAvg.toFixed(1)}개</div><div class="d">10월 말 예상 평균 ${fcAvg.toFixed(1)}개, 전년보다 ${Math.abs(fcAvg-lyAvg).toFixed(1)}개 ${fcAvg>lyAvg?'많음':'적음'}</div></div>`;
+  $('#cmp').innerHTML=`<div class="mini"><div class="k">이번 달 평균</div><div class="v num">${thisAvg.toFixed(1)}개</div></div>
+    <div class="mini"><div class="k">지난달 평균</div><div class="v num">${W.lastMonthAvg.toFixed(1)}개</div></div>
+    <div class="mini"><div class="k">작년 10월 평균</div><div class="v num">${lyAvg.toFixed(1)}개</div></div>
+    <div class="mini hl"><div class="k">10월 말 예상</div><div class="v num">${fcAvg.toFixed(1)}개</div></div>`;
   const host=$('#c-fc'),W0=Math.max(280,host.clientWidth),H=220,L=30,R=10,T=14,B=24,iw=W0-L-R,ih=H-T-B;
   const mx=niceMax(Math.max(...W.ly,...W.fc.map(f=>f.hi),...W.act)+1),x=d=>L+(d-1)/30*iw,y=v=>T+ih-v/mx*ih;let g='';
   [0,mx/2,mx].forEach(t=>{g+=`<line class="${t?'grid-l':'base-l'}" x1="${L}" x2="${W0-R}" y1="${y(t)}" y2="${y(t)}"/><text class="ax" x="${L-6}" y="${y(t)+4}" text-anchor="end">${t}</text>`});
   [1,8,15,22,29].forEach(d=>g+=`<text class="ax" x="${x(d)}" y="${H-6}" text-anchor="middle">10/${d}</text>`);
   const band=[[x(7),y(W.act[6])],...W.fc.map(f=>[x(f.d.getDate()),y(f.hi)]),...W.fc.slice().reverse().map(f=>[x(f.d.getDate()),y(f.lo)])];
-  g+=`<path d="M${band.map(p=>p.join(',')).join('L')}Z" fill="var(--s1)" fill-opacity=".12"/>`;
+  g+=`<path d="M${band.map(p=>p.join(',')).join('L')}Z" fill="var(--ok)" fill-opacity=".12"/>`;
   g+=`<polyline points="${W.ly.map((v,i)=>x(i+1)+','+y(v)).join(' ')}" fill="none" stroke="var(--ly)" stroke-width="2" stroke-linejoin="round"/>`;
-  g+=`<polyline points="${[[7,W.act[6]],...W.fc.map(f=>[f.d.getDate(),f.v])].map(([d,v])=>x(d)+','+y(v)).join(' ')}" fill="none" stroke="var(--s1)" stroke-width="2" stroke-dasharray="5 4"/>`;
-  g+=`<polyline points="${W.act.map((v,i)=>x(i+1)+','+y(v)).join(' ')}" fill="none" stroke="var(--s1)" stroke-width="2.5" stroke-linejoin="round"/>`;
-  g+=`<line x1="${x(7)}" x2="${x(7)}" y1="${T}" y2="${T+ih}" stroke="var(--t3)" stroke-dasharray="2 3"/><text class="ax" x="${x(7)+5}" y="${T+8}" style="fill:var(--t1);font-weight:700">오늘</text><circle cx="${x(7)}" cy="${y(W.act[6])}" r="4.5" fill="var(--s1)" stroke="var(--surface)" stroke-width="2"/><text class="ax" x="${x(31)}" y="${y(W.ly[30])-8}" text-anchor="end">2025</text>`;
-  g+=`<line id="xh" y1="${T}" y2="${T+ih}" stroke="var(--t3)" opacity="0"/><circle id="xd" r="4" fill="var(--s1)" stroke="var(--surface)" stroke-width="2" opacity="0"/><circle id="xl" r="3.5" fill="var(--ly)" stroke="var(--surface)" stroke-width="2" opacity="0"/><rect id="fc-hit" x="${L}" y="${T}" width="${iw}" height="${ih}" fill="transparent"/>`;
+  g+=`<polyline points="${[[7,W.act[6]],...W.fc.map(f=>[f.d.getDate(),f.v])].map(([d,v])=>x(d)+','+y(v)).join(' ')}" fill="none" stroke="var(--ok)" stroke-width="2" stroke-dasharray="5 4"/>`;
+  g+=`<polyline points="${W.act.map((v,i)=>x(i+1)+','+y(v)).join(' ')}" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linejoin="round"/>`;
+  g+=`<line x1="${x(7)}" x2="${x(7)}" y1="${T}" y2="${T+ih}" stroke="var(--t3)" stroke-dasharray="2 3"/><text class="ax" x="${x(7)+5}" y="${T+8}" style="fill:var(--t1);font-weight:700">오늘</text><circle cx="${x(7)}" cy="${y(W.act[6])}" r="4.5" fill="var(--ok)" stroke="var(--surface)" stroke-width="2"/><text class="ax" x="${x(31)}" y="${y(W.ly[30])-8}" text-anchor="end">2025</text>`;
+  g+=`<line id="xh" y1="${T}" y2="${T+ih}" stroke="var(--t3)" opacity="0"/><circle id="xd" r="4" fill="var(--ok)" stroke="var(--surface)" stroke-width="2" opacity="0"/><circle id="xl" r="3.5" fill="var(--ly)" stroke="var(--surface)" stroke-width="2" opacity="0"/><rect id="fc-hit" x="${L}" y="${T}" width="${iw}" height="${ih}" fill="transparent"/>`;
   host.innerHTML=`<svg viewBox="0 0 ${W0} ${H}" height="${H}" role="img" aria-label="10월 일별 빈 병상 실제와 예측, 전년 동월 비교">${g}</svg>`;
   const hit=host.querySelector('#fc-hit'),xh=host.querySelector('#xh'),xd=host.querySelector('#xd'),xl=host.querySelector('#xl');
   hit.addEventListener('mousemove',e=>{const bb=hit.getBoundingClientRect(),d=Math.max(1,Math.min(31,Math.round((e.clientX-bb.left)/bb.width*30)+1));
     const isA=d<=7,f=W.fc.find(q=>q.d.getDate()===d),v=isA?W.act[d-1]:f.v;
     xh.setAttribute('x1',x(d));xh.setAttribute('x2',x(d));xh.setAttribute('opacity',.6);xd.setAttribute('cx',x(d));xd.setAttribute('cy',y(v));xd.setAttribute('opacity',1);xl.setAttribute('cx',x(d));xl.setAttribute('cy',y(W.ly[d-1]));xl.setAttribute('opacity',1);
-    showTip(`<b>${md(new Date(2026,9,d))}</b><div class="r"><span><i style="background:var(--s1)"></i>${isA?'실제':'예측'}</span><b>${v}개${isA?'':` (${f.lo}~${f.hi})`}</b></div><div class="r"><span><i style="background:var(--ly)"></i>2025년</span><b>${W.ly[d-1]}개</b></div>${isA?'':`<div style="opacity:.75">퇴원 예정 ${f.outs}, 입원 예약 ${f.ins}</div>`}`,e.clientX,e.clientY)});
+    showTip(`<b>${md(new Date(2026,9,d))}</b><div class="r"><span><i style="background:var(--ok)"></i>${isA?'실제':'예측'}</span><b>${v}개${isA?'':` (${f.lo}~${f.hi})`}</b></div><div class="r"><span><i style="background:var(--ly)"></i>2025년</span><b>${W.ly[d-1]}개</b></div>${isA?'':`<div style="opacity:.75">퇴원 예정 ${f.outs}, 입원 예약 ${f.ins}</div>`}`,e.clientX,e.clientY)});
   hit.addEventListener('mouseleave',()=>{[xh,xd,xl].forEach(n=>n.setAttribute('opacity',0));hideTip()});
   const tight=W.next7.filter(n=>n.v<=1);
-  $('#fc-table').innerHTML=`<thead><tr><th>날짜</th><th class="r">퇴원 예정</th><th class="r">입원 예약</th><th class="r">예상 빈 병상</th></tr></thead><tbody>${W.next7.map(n=>`<tr class="${n.v<=1?'hl':''}"><td>${md(n.d)}</td><td class="r num">${n.outs}</td><td class="r num">${n.ins}</td><td class="r num"><b>${n.v}</b>${n.v<=1?' <span class="badge b-warn">부족</span>':''}</td></tr>`).join('')}</tbody><caption style="caption-side:bottom;text-align:left;font-size:12px;color:var(--t2);padding-top:10px">${tight.length?`${tight.map(t=>md(t.d)).join(', ')}은 빈 병상이 1개 이하로 예상돼요. 예약 입원 조정이나 타 병동 협조를 미리 검토하세요.`:'앞으로 7일 동안 빈 병상이 부족한 날은 없어요.'}</caption>`;
+  if($('#fc-table'))$('#fc-table').innerHTML=`<thead><tr><th>날짜</th><th class="r">퇴원 예정</th><th class="r">입원 예약</th><th class="r">예상 빈 병상</th></tr></thead><tbody>${W.next7.map(n=>`<tr class="${n.v<=1?'hl':''}"><td>${md(n.d)}</td><td class="r num">${n.outs}</td><td class="r num">${n.ins}</td><td class="r num"><b>${n.v}</b>${n.v<=1?' <span class="badge b-warn">부족</span>':''}</td></tr>`).join('')}</tbody><caption style="caption-side:bottom;text-align:left;font-size:12px;color:var(--t2);padding-top:10px">${tight.length?`${tight.map(t=>md(t.d)).join(', ')}은 빈 병상이 1개 이하로 예상돼요. 예약 입원 조정이나 타 병동 협조를 미리 검토하세요.`:'앞으로 7일 동안 빈 병상이 부족한 날은 없어요.'}</caption>`;
 }
 
 function vPatients(v){
   const pri=W.patients.filter(p=>p.lv).sort((a,b)=>!!a.ack-!!b.ack||b.lv-a.lv||a.bed.id.localeCompare(b.bed.id));
   const un=pri.filter(p=>!p.ack).length,dis=W.patients.filter(p=>p.disPlan==='오늘');
   const dDone=dis.filter(p=>chkN(p.reg)===4).length,aDone=W.incoming.filter(b=>chkN(b.id)===3).length;
-  v.innerHTML=`<div class="h-row"><div><div class="eyebrow">${W.cfg.name} · 재원 ${W.patients.length}명</div><h1>${un?`아직 확인하지 않은 신속 확인 환자가 ${un}명 있어요`:'신속 확인 환자를 모두 확인했어요'}</h1></div></div>
+  v.innerHTML=`<div class="h-row"><div><div class="eyebrow">${W.cfg.name} · 재원 ${W.patients.length}명</div><h1>${un?`확인 안 한 환자 ${un}명`:'모두 확인했어요'}</h1></div></div>
   <div class="card" style="margin-bottom:16px"><div class="card-h"><div><h2>신속히 확인할 환자</h2><div class="sub">확인하면 처리자와 시각이 남고, 다음 근무조에도 보입니다</div></div><div class="legend"><span class="badge b-crit">즉시</span><span class="badge b-warn">주의</span></div></div>
   <div class="pri">${pri.map(p=>`<div class="pcard ${p.lv===2?'c':''} ${p.ack?'ack':''}"><div class="top-l">${LV(p)}<span class="mono" style="font-size:12px;color:var(--t2)">${p.bed.id}</span></div>
     <a class="who" href="${pLink(p)}" style="text-decoration:none;color:inherit">${nm(p)}<small>${sx(p.sex)}/${p.age} · <span class="mono">${p.reg}</span> · ${p.dept}</small></a>
@@ -1093,21 +1133,21 @@ function renderTable(){
   $('#pdept').innerHTML=`<option value="all">진료과 전체</option>`+Object.keys(DEPT).filter(k=>ps.some(p=>p.dept===k)).map(k=>`<option value="${k}" ${S.pdept===k?'selected':''}>${DEPT[k].n} (${k})</option>`).join('');
   const list=filtered(),sk=S.sort.k,sd=S.sort.d;
   const th=(k,l)=>k?`<th class="sort ${sk===k?'sorted':''}" data-sort="${k}">${l}<span class="ar">${sk===k?(sd>0?'↑':'↓'):'↕'}</span></th>`:`<th>${l}</th>`;
-  const head=`<thead><tr>${th('room','병실-병상')}${th('lv','상태')}${th('name','환자명 (성별/나이)')}${th(null,'생년월일')}${th(null,'등록번호')}${th(null,'진료과 · 주치의')}${th(null,'진단명')}${th('adm','입원일시 / 경과일')}${th('dis','퇴원 예정')}${th(null,'병실 등급')}${th(null,'담당')}${th(null,'표시')}</tr></thead>`;
+  const head=`<thead><tr>${th('room','병실-병상')}${th('lv','상태')}${th('name','환자명 · 생년월일')}${th(null,'등록번호')}${th(null,'진료과 · 주치의')}${th(null,'진단명')}${th('adm','입원일시 / 경과일')}${th('dis','퇴원 예정')}${th(null,'병실 등급')}${th(null,'담당')}${th(null,'표시')}</tr></thead>`;
   const row=p=>`<tr class="p" data-reg="${p.reg}" tabindex="0"><td class="bed-c">${p.bed.id}</td><td class="lv">${LV(p)}${p.ack?'<span style="color:var(--t3);font-size:11px;margin-left:4px">확인</span>':''}</td>
-    <td><span class="nm">${nm(p)}${p.same?'<span class="same" title="같은 병동에 같은 이름의 환자가 있어요">동명</span>':''}<small>${sx(p.sex)}/${p.age}</small></span></td>
-    <td class="mono">${p.birth}</td><td class="mono"><b>${p.reg}</b></td><td>${DEPT[p.dept].n} <span style="color:var(--t3)">${p.dr}</span></td>
+    <td><span class="nm">${nm(p)}${p.same?'<span class="same" title="같은 병동에 같은 이름의 환자가 있어요">동명</span>':''}<small>${sx(p.sex)}/${p.age}</small></span><span class="birth">${p.birth}</span></td>
+    <td class="mono"><b>${p.reg}</b></td><td>${DEPT[p.dept].n} <span style="color:var(--t3)">${p.dr}</span></td>
     <td class="dx">${p.dx}</td><td class="num">${admStr(p)}<span class="hd">+${p.hd}일</span></td>
-    <td>${p.disPlan==='오늘'?'<span class="badge b-warn">오늘</span>':p.disPlan==='-'?'<span style="color:var(--t3)">-</span>':p.disPlan}</td><td>${p.grade}</td><td>${p.nurse}</td><td><div class="flags">${FLAG(p)}</div></td></tr>`;
+    <td>${p.disPlan==='오늘'?'<span class="badge b-dis">오늘</span>':p.disPlan==='-'?'<span style="color:var(--t3)">-</span>':p.disPlan}</td><td>${p.grade}</td><td>${p.nurse}</td><td><div class="flags">${FLAG(p,1)}</div></td></tr>`;
   let rows='';
   if(sk==='room'){
     const showEmpty=S.pf==='all'&&S.pdept==='all'&&!S.q&&!S.mine;
     const rooms=sd>0?W.rooms:[...W.rooms].reverse();
     rooms.forEach(r=>{const inRoom=r.beds.filter(b=>b.p&&list.includes(b.p)||(showEmpty&&!b.p));if(!inRoom.length)return;const g=gOf(r);
-      rows+=`<tr class="grp"><td colspan="12">${r.no}호 · ${r.grade}${g?' · '+sx(g):''}<span>${r.beds.filter(b=>b.p).length}/${r.beds.length} 사용</span></td></tr>`;
-      inRoom.forEach(b=>{rows+=b.p?row(b.p):`<tr class="emp"><td class="bed-c">${b.id}</td><td colspan="11">${b.st==='adm'?`입원 예정 · ${b.inc.eta} ${nmS(b.inc.name)} (${sx(b.inc.sex)}/${b.inc.age}) ${b.inc.route}`:ST[b.st]}</td></tr>`})});
+      rows+=`<tr class="grp"><td colspan="11">${r.no}호 · ${r.grade}${g?' · '+sx(g):''}<span>${r.beds.filter(b=>b.p).length}/${r.beds.length} 사용</span></td></tr>`;
+      inRoom.forEach(b=>{rows+=b.p?row(b.p):`<tr class="emp"><td class="bed-c">${b.id}</td><td colspan="10">${b.st==='adm'?`입원 예정 · ${b.inc.eta} ${nmS(b.inc.name)} (${sx(b.inc.sex)}/${b.inc.age}) ${b.inc.route}`:ST[b.st]}</td></tr>`})});
   }else{const f=SORTS[sk];rows=list.slice().sort((a,b)=>{const x=f(a),y=f(b);return (x>y?1:x<y?-1:0)*sd}).map(row).join('')}
-  $('#pt').innerHTML=head+`<tbody>${rows||`<tr><td colspan="12" class="empty-st">조건에 맞는 환자가 없어요. 필터를 바꾸거나 검색어를 지워 보세요.</td></tr>`}</tbody>`;
+  $('#pt').innerHTML=head+`<tbody>${rows||`<tr><td colspan="11" class="empty-st">조건에 맞는 환자가 없어요. 필터를 바꾸거나 검색어를 지워 보세요.</td></tr>`}</tbody>`;
 }
 
 function chkHTML(key,steps){return `<div class="chks">${steps.map((s,i)=>{const on=W.chk[key]&&W.chk[key][i];return `<button class="chk" aria-pressed="${!!on}" data-act="chk" data-k="${key}" data-i="${i}" title="${on||''}"><span class="bx">${on?'<svg viewBox="0 0 14 14"><path d="M3 7.2l2.6 2.6L11 4.4" stroke="#fff" stroke-width="2" fill="none"/></svg>':''}</span>${s}</button>`}).join('')}</div>`}
@@ -1115,7 +1155,7 @@ function vAdmission(v){
   const dis=W.patients.filter(p=>p.disPlan==='오늘').sort((a,b)=>a.bed.id.localeCompare(b.bed.id));
   const inc=W.incoming.slice().sort((a,b)=>a.inc.eta.localeCompare(b.inc.eta));
   const left=dis.filter(p=>chkN(p.reg)<4).length+inc.filter(b=>chkN(b.id)<3).length;
-  v.innerHTML=`<div class="h-row"><div><div class="eyebrow">${W.cfg.name} · ${md(now())}</div><h1>${left?`오늘 입·퇴원 ${dis.length+inc.length}건 중 ${left}건이 준비 중이에요`:'오늘 입·퇴원 준비를 모두 마쳤어요'}</h1></div></div>
+  v.innerHTML=`<div class="h-row"><div><div class="eyebrow">${W.cfg.name} · ${md(now())}</div><h1>${left?`준비 중 ${left}건`:'모두 준비했어요'}</h1></div></div>
   <div class="io" style="margin-bottom:16px">
     <div class="card"><div class="card-h"><div><h2>오늘 퇴원 예정 ${dis.length}명</h2><div class="sub">4단계를 모두 마치면 퇴원 처리할 수 있어요. 퇴원 처리하면 병상은 정리 중으로 바뀝니다</div></div></div>
       ${dis.map(p=>{const n=chkN(p.reg);return `<div class="io-row"><div><a class="who" href="${pLink(p)}" style="text-decoration:none;color:inherit">${nm(p)}<small>${sx(p.sex)}/${p.age} · <span class="mono">${p.reg}</span></small></a><div class="ln"><span class="mono">${p.bed.id}</span> · ${DEPT[p.dept].n} ${p.dr} · 입원 ${p.hd+1}일째</div>${chkHTML(p.reg,DSTEPS)}</div>
@@ -1187,14 +1227,14 @@ function go(h){if(location.hash.slice(1)===h)render();else location.hash=h}
 function render(){
   const {r,reg}=route(),v=$('#view');
   document.documentElement.toggleAttribute('data-theme',!!S.theme);if(S.theme)document.documentElement.dataset.theme=S.theme;
-  $('#dark').checked=S.theme==='dark';$('#mask').checked=S.mask;$('#ward').value=S.ward;
+  $('#dark').checked=S.theme==='dark';$('#mask').checked=S.mask;$('#ward-n').textContent=W.cfg.name;
   $('#ward-m').textContent=`${W.cfg.loc} · ${W.all.length}병상`;
   $$('.nv').forEach(a=>a.classList.toggle('on',a.dataset.r===r||(r==='patient'&&a.dataset.r==='patients')));
   const un=W.patients.filter(p=>p.lv&&!p.ack).length,io=W.patients.filter(p=>p.disPlan==='오늘').length+W.incoming.length;
   $('#n-pri').textContent=un||'';$('#n-pri').hidden=!un;$('#n-io').textContent=io||'';$('#n-io').hidden=!io;$('#n-wait').textContent=W.waiting.length?'대기 '+W.waiting.length:'';$('#n-wait').hidden=!W.waiting.length;
   $('#crumb-w').textContent=W.cfg.name;
   const p=reg&&pByReg(reg);$('#crumb-t').textContent=r==='patient'?(p?`환자 상세 · ${nm(p)}`:'환자 상세'):VIEWS[r].t;
-  document.title=`${r==='patient'?'환자 상세':VIEWS[r].t} · WardBoard`;
+  document.title=`${r==='patient'?'환자 상세':VIEWS[r].t} · 병동 현황판`;
   const crit=W.patients.filter(p=>p.lv===2&&!p.ack).length;$('#bell-c').textContent=crit+(W.waiting.length?1:0);$('#bell-c').hidden=!(crit+(W.waiting.length?1:0));
   const y=scrollY,same=v.dataset.r===(r+(reg||''));
   if(r==='patient')vPatient(v,reg);else VIEWS[r].f(v);
@@ -1204,7 +1244,11 @@ addEventListener('hashchange',()=>{closeSide();closePops();render();scrollTo(0,0
 function closeSide(){$('#side').classList.remove('on');$('#scrim').classList.remove('on')}
 function closePops(){$('#bell-pop').hidden=true;$('#gs-res').hidden=true}
 $('#scrim').onclick=closeSide;
-$('#ward').onchange=e=>{S.ward=e.target.value;S.boardF=null;save();rebuild();render();toast(`${W.cfg.name}로 바꿨어요`,false)};
+function wardList(open){const b=$('#ward-btn'),l=$('#ward-list');b.setAttribute('aria-expanded',open);l.hidden=!open;if(!open)return;
+  l.innerHTML=Object.entries(WARDS).map(([k,w])=>`<button class="wopt" role="option" aria-selected="${k===S.ward}" data-ward="${k}"><div><b>${w.name}</b><span>${w.loc}</span></div>${k===S.ward?'<svg viewBox="0 0 14 14" fill="none"><path d="M2.5 7.5l3 3 6-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>':''}</button>`).join('')}
+$('#ward-btn').onclick=()=>wardList($('#ward-list').hidden);
+$('#ward-list').onclick=e=>{const o=e.target.closest('[data-ward]');if(!o)return;wardList(false);if(o.dataset.ward===S.ward)return;S.ward=o.dataset.ward;S.boardF=null;save();rebuild();render();toast(`${W.cfg.name}로 바꿨어요`,false)};
+document.addEventListener('keydown',e=>{if(e.key==='Escape')wardList(false)});
 $('#mask').onchange=e=>{S.mask=e.target.checked;save();render()};
 $('#dark').onchange=e=>{S.theme=e.target.checked?'dark':'light';save();render()};
 function bell(){
@@ -1224,6 +1268,7 @@ $('#gs').addEventListener('focus',gsRender);
 $('#gs').addEventListener('keydown',e=>{const a=$$('#gs-res a');if(e.key==='ArrowDown'){gsI=Math.min(gsI+1,a.length-1);gsRender();e.preventDefault()}if(e.key==='ArrowUp'){gsI=Math.max(gsI-1,0);gsRender();e.preventDefault()}if(e.key==='Enter'&&a[gsI]){location.hash=a[gsI].getAttribute('href');$('#gs').value='';$('#gs').blur();closePops()}if(e.key==='Escape'){$('#gs').blur();closePops()}});
 document.addEventListener('keydown',e=>{if(e.key==='/'&&!/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)){e.preventDefault();$('#gs').focus()}if(e.key==='Escape'){closeModal();closePops();closeSide()}if(e.key==='Enter'&&e.target.matches('tr.p'))go('patient-'+e.target.dataset.reg)});
 document.addEventListener('click',e=>{
+  if(!e.target.closest('.wsel'))wardList(false);
   if(!e.target.closest('.gsearch'))$('#gs-res').hidden=true;
   if(!e.target.closest('[data-act="bell"],#bell-pop'))$('#bell-pop').hidden=true;
   if(e.target.closest('#gs-res a')){$('#gs').value=''}
